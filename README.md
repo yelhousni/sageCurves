@@ -14,8 +14,6 @@ sage -python curve_parameters_libff.py path/to/curve_file.txt > path/to/output_d
 type:curve_name
 a
 b
-r
-q
 u
 ```
 Where: 
@@ -23,8 +21,6 @@ Where:
 + `curve_name` e.g.: `alt_bn128` or `bls12_381`
 + `a` curve coefficient as in `y^2=x^3+a*x+b`
 + `b` curve coefficient as in `y^2=x^3+a*x+b`
-+ `q` base field `Fq` order
-+ `r` subgroup `Fr` order
 + `u` from the polynomials `q(u)` and `r(u)` for `bn`, `bls12` and `bw12` families
 
 ### Examples
