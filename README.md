@@ -7,7 +7,7 @@ sageCurves requires a working [SageMath](http://www.sagemath.org) installation, 
 
 ## Tutorial
 ```python
-sage curve_parameters_libff.sage path/to/curve_file.txt > path/to/output_dir/curve_name_init.cpp
+sage -python curve_parameters_libff.py path/to/curve_file.txt > path/to/output_dir/curve_name_init.cpp
 ```
 `curve_file.txt` should be written as follow: 
 ```
@@ -29,7 +29,7 @@ Where:
 
 ### Examples
 ```python
-sage curve_parameters_libff.sage Curves/bls12_377.txt > ./bls12_377_init.cpp
+sage -python curve_parameters_libff.py Curves/bls12_377.txt > ./bls12_377_init.cpp
 ```
 This repo was used to add 8 curves to libff [here](https://github.com/EYBlockchain/zk-swap-libff/tree/ey/libff/algebra/curves)
 
