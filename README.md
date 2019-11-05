@@ -17,10 +17,10 @@ b
 u
 ```
 Where: 
-+ `type` specifies the curve family (`bn`, `bls12`, `bw12` or `sw` if no specific family)
++ `type` specifies the curve family (`bn`, `bls12`, `bw12`)
 + `curve_name` e.g.: `alt_bn128` or `bls12_381`
-+ `a` curve coefficient as in `y^2=x^3+a*x+b`
-+ `b` curve coefficient as in `y^2=x^3+a*x+b`
++ `a` curve coefficient as in short Weierstrass equation: `y^2=x^3+a*x+b`
++ `b` curve coefficient as in short Weierstrass equation: `y^2=x^3+a*x+b`
 + `u` from the polynomials `q(u)` and `r(u)` for `bn`, `bls12` and `bw12` families
 
 ### Examples
