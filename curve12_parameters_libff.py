@@ -4,7 +4,12 @@
 # youssef.el.housni@fr.ey.com / youssef.housni21@gmail.com 
 
 """
-Computes curve parameters necessary for libff implementation
+Computes parameters necessary for libff implementation
+of an elliptic curve from the families BN, BLS12 and BW12
+
+For these families: 
+    * embedding degree k=12
+    * complex multiplication discriminant D=-3
 """
 
 from sage.all_cmdline import *   # import sage library
@@ -21,30 +26,25 @@ def help():
     print('')
 	
 def main():
-    if (len(sys.argv) != 2 ): sys.exit(help())
+    if (len(sys.argv) != 2): sys.exit(help())
     try:
         curveFile = sys.argv[1]
         with open(curveFile, 'r') as f:
             lines = f.readlines()
             family = lines[0].split(":")[0]
             curve = lines[0].split(":")[1][:-1]
-            # TODO: compute a and b
-            coeff_a = Integer(lines[1])
-            coeff_b = Integer(lines[2]) 
-            x =  Integer(lines[3])
+            x = Integer(lines[1])
 
-        if (family == 'bn'): 
-            q = q_bn(x)
-            r = r_bn(x)
-        elif (family == 'bls'): 
-            q = q_bls12(x)
-            r = r_bls12(x)
-        elif (family == 'bw'): 
-            q = q_bw12(x)
-            r = r_bw12(x)
-        else: 
-            raise Exception("family unknown or not supported")
-
+        # Curve
+        q = get_q(family, x)
+        t = get_t(family, x)
+        r = get_r(family, x)
+        k = Integer(12)
+        D = Integer(-3)
+        E = small_B_twist(make_curve(q,t,r,k,D))
+        coeff_a = E.a4()
+        coeff_b = E.a6()
+            
         # header
         print_header(curve)
 
@@ -94,11 +94,9 @@ def main():
         print('\t' + curve + '_G2::G2_one = ' + curve + '_G2(' + curve + '_Fq2(' + curve + '_Fq("' + str(G2[0].polynomial().list()[0]) + '"),' + curve + '_Fq("' + str(0  if len(G2[0].polynomial().list()) == 1  else G2[0].polynomial().list()[1]) + '")),' + curve + '_Fq2(' + curve + '_Fq("' + str(G2[1].polynomial().list()[0]) + '"),' + curve + '_Fq("' + str(0  if len(G2[1].polynomial().list()) == 1  else G2[1].polynomial().list()[1]) + '")),' + curve + 'Fq2::one()));')
 
         # pairing parameters
-        emb_degree = 12 
-        trace = Fq6_params[8]
-        if (family == 'bn' or family == 'bw'):
-            ate_loop_count = 6 *x+2 
-        elif (family == 'bls'):
+        if (family == 'bn' or family == 'bw12'):
+            ate_loop_count = 6*x+2 
+        elif (family == 'bls12'):
             ate_loop_count = x
         else: 
             raise Exception("family unknown or not supported")
@@ -106,7 +104,7 @@ def main():
             ate_loop_is_neg = 'true'; 
         else:
             ate_loop_is_neg = 'false'; 
-        final_exponent = (q**emb_degree-1 )/r 
+        final_exponent = (q**k-1)/r 
         if (x<0 ):
             final_exponent_is_z_neg = 'true'
         else:
