@@ -6,6 +6,8 @@
 from sage.all_cmdline import *   # import sage library
 import sys
 
+#TODO: for BN 'friendly' curves write coeff_b as c^4+d^6 or c^6+4d^4 and most parameters follow easily
+
 # Curve utils
 def make_curve(q,t,r,k,D,debug=False):
     """
@@ -89,41 +91,6 @@ def make_curve(q,t,r,k,D,debug=False):
         f.close()
         return False
     return E
-
-def small_B_twist(E):
-    """
-    Description:
-        
-        Finds a curve isogenous to E that has small B in the curve equation y^2 = x^3 + A*x + B
-    
-    Input:
-    
-        E - elliptic curve
-    
-    Output:
-    
-        E' - elliptic curve isogenous to E that has small B in the curve equation y^2 = x^3 + A*x + B
-    
-    """
-    b = E.ainvs()[4]
-    q = E.base_field().order()
-    b = power_mod(Integer(b), -1, q)
-    d = 0
-    s = Mod(1,q)
-    bool = True
-    while bool:
-        try:
-            d = (s*b)
-            d = d.nth_root(3)
-            d = Integer(d)
-            bool = False
-        except ValueError as e:
-            s+=1 
-            pass
-    ainvs = [i for i in E.ainvs()]
-    ainvs[3] *= d**2
-    ainvs[4] *= d**3
-    return EllipticCurve(E.base_field(), ainvs)
 
 def test_curve(q,t,r,k,D,E): 
     """
@@ -366,8 +333,8 @@ def parameters_Fp2(modulus):
     t = int((modulus**2-1)/2**s)
     t_minus_1_over_2 = int((t-1)/2)
     Fq = GF(modulus)
-    if (modulus % 4 == 3):
-        non_residue = Fq(-1)
+    if (modulus % 4 == 3): 
+        non_residue = Fq(-1) # Legendre symbol is clearly -1
     else:
         non_residue = least_quadratic_nonresidue(modulus)
     P = Fq['z']; (z,) = P._first_ngens(1)
@@ -407,9 +374,9 @@ def parameters_Fp6(modulus, non_residue, coeff_b, r):
     Frobenius_coeffs_c1 = []
     Frobenius_coeffs_c2 = []
     mul_by_q = []
-    for i in range(6 ):
+    for i in range(6):
         Frobenius_coeffs_c1.append(nqr**int((modulus**i-1 )/3 ))
-    for i in range(6 ):
+    for i in range(6):
         Frobenius_coeffs_c2.append(nqr**int((2 *modulus**i-2 )/3 ))
     "compute mul_by_q for later"
     mul_by_q.append(Frobenius_coeffs_c1[2 ])
@@ -425,11 +392,19 @@ def parameters_Fp6(modulus, non_residue, coeff_b, r):
         twist_type = 'D'
     assert(Et.order() % r == 0 )
     "compute G1 generator for later"
+    # to change to fit chosen generators in standard curves
+    # for bls12-381, take: https://github.com/zkcrypto/bls12_381/blob/master/src/notes/design.rs
     E = EllipticCurve(Fq, [0 , coeff_b])
-    G1_one = E.random_point() # BN is prime order. TODO: find the simplest generator 
+    cofactor = Integer(E.order() / r)
+    if ((1+coeff_b).is_square()): # it is the case for BN
+        G1_one = cofactor * E(1, sqrt(1+coeff_b))
+    else:
+        G1_one = cofactor * E.random_point() 
     "compute G2 generator for later"
-    Et = EllipticCurve(Fq2, [0 , coeff_b_twist])
-    G2_one = Et.random_point()
+    # to change to fit chosen generators in standard curves
+    # for bls12-381, take: https://github.com/zkcrypto/bls12_381/blob/master/src/notes/design.rs
+    cofactor_t = Integer(Et.order()/r)
+    G2_one = cofactor_t * Et.random_point()
     return nqr, Frobenius_coeffs_c1, Frobenius_coeffs_c2, mul_by_q, coeff_b_twist, twist_type, G1_one, G2_one
 
 def parameters_Fp12(modulus, nqr):

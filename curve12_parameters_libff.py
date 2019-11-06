@@ -41,7 +41,7 @@ def main():
         r = get_r(family, x)
         k = Integer(12)
         D = Integer(-3)
-        E = small_B_twist(make_curve(q,t,r,k,D))
+        E = make_curve(q,t,r,k,D)
         coeff_a = E.a4()
         coeff_b = E.a6()
             
