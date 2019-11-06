@@ -343,7 +343,6 @@ def parameters_Fp(modulus):
     t_minus_1_over_2 = int((t-1)/2)
     multiplicative_generator = primitive_root(modulus)
     root_of_unity = power_mod(multiplicative_generator, t, modulus)
-    " not necessiraly the least, can be chosen manually "
     nqr = least_quadratic_nonresidue(modulus)
     nqr_to_t = power_mod(nqr, t, modulus)
     return modulus, Rsq8, Rcu8, inv8, Rsq4, Rcu4, inv4, num_bits, euler, s, t, t_minus_1_over_2, multiplicative_generator, root_of_unity, nqr, nqr_to_t
@@ -366,15 +365,15 @@ def parameters_Fp2(modulus):
     s = twoAdicity(modulus**2-1)
     t = int((modulus**2-1)/2**s)
     t_minus_1_over_2 = int((t-1)/2)
-    " not necessiraly the least, can be chosen manually "
-    non_residue = least_quadratic_nonresidue(modulus)
     Fq = GF(modulus)
+    if (modulus % 4 == 3):
+        non_residue = Fq(-1)
+    else:
+        non_residue = least_quadratic_nonresidue(modulus)
     P = Fq['z']; (z,) = P._first_ngens(1)
     assert((z**2 -non_residue).is_irreducible())
     Fq2 = GF(modulus**2, modulus=z**2-non_residue, names=('u',)); (u,) = Fq2._first_ngens(1)
     PP = Fq2['zz']; (zz,) = PP._first_ngens(1)
-    " find quadratic non-residue "
-    " not necessiraly the least, can be chosen manually "
     nqr = u
     while(not (zz**2 -nqr).is_irreducible()):
         nqr += 1 
