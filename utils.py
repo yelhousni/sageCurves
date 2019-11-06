@@ -395,15 +395,16 @@ def parameters_Fp6(modulus, non_residue, coeff_b, r):
     # to change to fit chosen generators in standard curves
     # for bls12-381, take: https://github.com/zkcrypto/bls12_381/blob/master/src/notes/design.rs
     E = EllipticCurve(Fq, [0 , coeff_b])
+    cofactor = Integer(E.order() / r)
     if ((1+coeff_b).is_square()): # it is the case for BN
-        G1_one = E(1, sqrt(1+coeff_b))
+        G1_one = cofactor * E(1, sqrt(1+coeff_b))
     else:
-        G1_one = E.random_point() 
+        G1_one = cofactor * E.random_point() 
     "compute G2 generator for later"
     # to change to fit chosen generators in standard curves
     # for bls12-381, take: https://github.com/zkcrypto/bls12_381/blob/master/src/notes/design.rs
-    Et = EllipticCurve(Fq2, [0 , coeff_b_twist])
-    G2_one = Et.random_point()
+    cofactor_t = Integer(Et.order()/r)
+    G2_one = cofactor_t * Et.random_point()
     return nqr, Frobenius_coeffs_c1, Frobenius_coeffs_c2, mul_by_q, coeff_b_twist, twist_type, G1_one, G2_one
 
 def parameters_Fp12(modulus, nqr):
