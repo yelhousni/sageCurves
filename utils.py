@@ -6,175 +6,11 @@
 from sage.all_cmdline import *   # import sage library
 import sys
 
-def is_valid_curve(q,t,r,k,D):
-    """
-    Description:
-
-        Tests that (q,t,r,k,D) is a valid elliptic curve
-
-    Input:
-
-        q - size of prime field
-        t - trace of Frobenius
-        r - size of prime order subgroup
-        k - embedding degree
-        D - (negative) fundamental discriminant
-
-    Output:
-
-        bool - true iff there exists an elliptic curve over F_q with trace t, a subgroup of order r with embedding degree k, and fundamental discriminant D
-    """
-    if q == 0 or t == 0 or r == 0 or k == 0 or D == 0:
-        return False
-    if not is_prime(q):
-        return False
-    if not is_prime(r):
-        return False
-    if not fundamental_discriminant(D) == D:
-        return False
-    if D % 4 == 0: #check CM equation
-        if not is_square(4*(t*t - 4*q)//D):
-            return False
-    if D % 4 == 1:
-        if not is_square((t*t - 4*q)//D):
-            return False
-    if not (q+1-t) % r == 0: #check r | #E(F_q)
-        return False
-    if not power_mod(q,k,r) == 1: #check embedding degree is k
-        return False
-    return True
-
-def get_q(family, u):
-    """
-    Description:
-
-        Computes the field size of a BN/BLS12/BW12 elliptic curve
-
-    Input:
-
-        family - pairing-friendly family (bn, bls12 or bw12) 
-        u - curve integer
-
-    Output:
-
-        Integer - field size
-    """
-    if (family == 'bn'):
-       return Integer(36*u**4+36*u**3+24*u**2+6*u+1)
-    elif (family == 'bls12'):
-        return Integer((u-1)**2 * ((u**4-u**2+1)/3) + u)
-    elif (family == 'bw12'):
-        return Integer(1728*u**6+2160*u**5+1548*u**4+756*u**3+240*u**2+54*u+7) 
-    else:
-        raise Exception('family not supported')
-
-def get_r(family, u):
-    """
-    Description:
-
-        Computes the subgroup order of a BN/BLS12/BW12 elliptic curve
-
-    Input:
-
-        family - pairing-friendly family (bn, bls12 or bw12) 
-        u - curve integer
-
-    Output:
-
-        Integer - subgroup order
-    """
-    if (family == 'bn'):
-        return Integer(36*u**4+36*u**3+18*u**2+6*u+1)
-    elif (family == 'bls12'):
-        return Integer(u**4-u**2+1)
-    elif (family == 'bw12'):
-        return Integer(36*u**4+36*u**3+18*u**2+6*u+1) 
-    else:
-        raise Exception('family not supported')
-
-def get_t(family, u):
-    """
-    Description:
-
-        Computes the Frebonius trace of a BN/BLS12/BW12 elliptic curve
-
-    Input:
-
-        family - pairing-friendly family (bn, bls12 or bw12) 
-        u - curve integer
-
-    Output:
-
-        Integer - Frobenius trace
-    """
-    if (family == 'bn'):
-        return Integer(6*u**2+1)
-    elif (family == 'bls12'):
-        return Integer(u+1)
-    elif (family == 'bw12'):
-        return Integer(-6*u**2+1)
-    else:
-        raise Exception('family not supported')
-
-def next_power_of_2(x):  
-     return 1 if x == 0 else int(log(2 **(x - 1).nbits())/log(2))
-
-def round_up(num, word):
-     return num if num % word == 0  else num + word - num % word
-
-def montgomery(p):
-    """
-    Description:
-
-        Computes parameters needed for Montgomery arithmetic
-
-    Input:
-
-        p - modulus
-
-    Output:
-
-        2x Integer - Montgomery constant squared for 64-arch and 32-arch
-        2x Integer - Montgomery constant cubed for 64-arch and 32-arch
-        2x hex - inverse of minus modulus for 64-arch and 32-arch
-    """ 
-    size64 = round_up(next_power_of_2(p), 64 )
-    R64 = 2 **size64 
-    R2_64 = mod(R64**2 , p)
-    R3_64 = mod(R64**3 , p)
-    inv64 = hex(-1 /p % 2 **64 )
-
-    size32 = round_up(next_power_of_2(p), 32 )
-    R32 = 2 **size32 
-    R2_32 = mod(R32**2 , p)
-    R3_32 = mod(R32**3 , p)
-    inv32 = hex(-1 /p % 2 **32 )
-
-    return R2_64, R3_64, inv64, R2_32, R3_32, inv32  
-
-def twoAdicity(num):
-    """
-    Description:
-
-        Computes the 2-adicity order of an integer
-
-    Input:
-
-        num - integer
-
-    Output:
-
-        Integer - 2-adicity order 
-    """ 
-    if num % 2  != 0 : return 1 
-    factor = 0 
-    while num % 2  == 0 :
-        num /= 2 
-        factor += 1 
-    return factor
-
+# Curve utils
 def make_curve(q,t,r,k,D,debug=False):
     """
+    credits to https://github.com/scipr-lab/ecfactory
+
     Description:
     
         Finds the curve equation for the elliptic curve (q,t,r,k,D) using the Complex Multiplication method
@@ -316,6 +152,175 @@ def test_curve(q,t,r,k,D,E):
     bool = bool and (E.cardinality() % r ==0)
     return bool
 
+
+def is_valid_curve(q,t,r,k,D):
+    """
+    Description:
+
+        Tests that (q,t,r,k,D) is a valid elliptic curve
+
+    Input:
+
+        q - size of prime field
+        t - trace of Frobenius
+        r - size of prime order subgroup
+        k - embedding degree
+        D - (negative) fundamental discriminant
+
+    Output:
+
+        bool - true iff there exists an elliptic curve over F_q with trace t, a subgroup of order r with embedding degree k, and fundamental discriminant D
+    """
+    if q == 0 or t == 0 or r == 0 or k == 0 or D == 0:
+        return False
+    if not is_prime(q):
+        return False
+    if not is_prime(r):
+        return False
+    if not fundamental_discriminant(D) == D:
+        return False
+    if D % 4 == 0: #check CM equation
+        if not is_square(4*(t*t - 4*q)//D):
+            return False
+    if D % 4 == 1:
+        if not is_square((t*t - 4*q)//D):
+            return False
+    if not (q+1-t) % r == 0: #check r | #E(F_q)
+        return False
+    if not power_mod(q,k,r) == 1: #check embedding degree is k
+        return False
+    return True
+
+def get_q(family, u):
+    """
+    Description:
+
+        Computes the field size of a BN/BLS12/BW12 elliptic curve
+
+    Input:
+
+        family - pairing-friendly family (bn, bls12 or bw12) 
+        u - curve integer
+
+    Output:
+
+        Integer - field size
+    """
+    if (family == 'bn'):
+       return Integer(36*u**4+36*u**3+24*u**2+6*u+1)
+    elif (family == 'bls12'):
+        return Integer((u-1)**2 * ((u**4-u**2+1)/3) + u)
+    elif (family == 'bw12'):
+        return Integer(1728*u**6+2160*u**5+1548*u**4+756*u**3+240*u**2+54*u+7) 
+    else:
+        raise Exception('family not supported')
+
+def get_r(family, u):
+    """
+    Description:
+
+        Computes the subgroup order of a BN/BLS12/BW12 elliptic curve
+
+    Input:
+
+        family - pairing-friendly family (bn, bls12 or bw12) 
+        u - curve integer
+
+    Output:
+
+        Integer - subgroup order
+    """
+    if (family == 'bn'):
+        return Integer(36*u**4+36*u**3+18*u**2+6*u+1)
+    elif (family == 'bls12'):
+        return Integer(u**4-u**2+1)
+    elif (family == 'bw12'):
+        return Integer(36*u**4+36*u**3+18*u**2+6*u+1) 
+    else:
+        raise Exception('family not supported')
+
+def get_t(family, u):
+    """
+    Description:
+
+        Computes the Frebonius trace of a BN/BLS12/BW12 elliptic curve
+
+    Input:
+
+        family - pairing-friendly family (bn, bls12 or bw12) 
+        u - curve integer
+
+    Output:
+
+        Integer - Frobenius trace
+    """
+    if (family == 'bn'):
+        return Integer(6*u**2+1)
+    elif (family == 'bls12'):
+        return Integer(u+1)
+    elif (family == 'bw12'):
+        return Integer(-6*u**2+1)
+    else:
+        raise Exception('family not supported')
+
+# Field utils
+def next_power_of_2(x):  
+     return 1 if x == 0 else int(log(2 **(x - 1).nbits())/log(2))
+
+def round_up(num, word):
+     return num if num % word == 0  else num + word - num % word
+
+def montgomery(p):
+    """
+    Description:
+
+        Computes parameters needed for Montgomery arithmetic
+
+    Input:
+
+        p - modulus
+
+    Output:
+
+        2x Integer - Montgomery constant squared for 64-arch and 32-arch
+        2x Integer - Montgomery constant cubed for 64-arch and 32-arch
+        2x hex - inverse of minus modulus for 64-arch and 32-arch
+    """ 
+    size64 = round_up(next_power_of_2(p), 64 )
+    R64 = 2 **size64 
+    R2_64 = mod(R64**2 , p)
+    R3_64 = mod(R64**3 , p)
+    inv64 = hex(-1 /p % 2 **64 )
+
+    size32 = round_up(next_power_of_2(p), 32 )
+    R32 = 2 **size32 
+    R2_32 = mod(R32**2 , p)
+    R3_32 = mod(R32**3 , p)
+    inv32 = hex(-1 /p % 2 **32 )
+
+    return R2_64, R3_64, inv64, R2_32, R3_32, inv32  
+
+def twoAdicity(num):
+    """
+    Description:
+
+        Computes the 2-adicity order of an integer
+
+    Input:
+
+        num - integer
+
+    Output:
+
+        Integer - 2-adicity order 
+    """ 
+    if num % 2  != 0 : return 1 
+    factor = 0 
+    while num % 2  == 0 :
+        num /= 2 
+        factor += 1 
+    return factor
+
 def parameters_Fp(modulus):
     """
     Description:
@@ -331,11 +336,11 @@ def parameters_Fp(modulus):
     """ 
     Rsq8, Rcu8, inv8, Rsq4, Rcu4, inv4 = montgomery(modulus) 
     num_bits = modulus.nbits()
-    euler = int((modulus-1 )/2 )
-    s = twoAdicity(modulus-1 )
-    assert( (modulus-1 )%2 **s == 0 )
-    t = int((modulus-1 )/2 **s)
-    t_minus_1_over_2 = int((t-1 )/2 )
+    euler = int((modulus-1)/2)
+    s = twoAdicity(modulus-1)
+    assert( (modulus-1)%2 **s == 0 )
+    t = int((modulus-1)/2 **s)
+    t_minus_1_over_2 = int((t-1)/2)
     multiplicative_generator = primitive_root(modulus)
     root_of_unity = power_mod(multiplicative_generator, t, modulus)
     " not necessiraly the least, can be chosen manually "
@@ -357,16 +362,16 @@ def parameters_Fp2(modulus):
     Output:
         euler, s, t, t_minus_1_over_2, non_residue, nqr, nqr_to_t, Frobenius_coeff_C1[0], Frobenius_coeff_C1[1]
     """ 
-    euler = int((modulus**2 -1 )/2 )
-    s = twoAdicity(modulus**2 -1 )
-    t = int((modulus**2 -1 )/2 **s)
-    t_minus_1_over_2 = int((t-1 )/2 )
+    euler = int((modulus**2-1)/2)
+    s = twoAdicity(modulus**2-1)
+    t = int((modulus**2-1)/2**s)
+    t_minus_1_over_2 = int((t-1)/2)
     " not necessiraly the least, can be chosen manually "
     non_residue = least_quadratic_nonresidue(modulus)
     Fq = GF(modulus)
     P = Fq['z']; (z,) = P._first_ngens(1)
     assert((z**2 -non_residue).is_irreducible())
-    Fq2 = GF(modulus**2 , modulus=z**2 -non_residue, names=('u',)); (u,) = Fq2._first_ngens(1)
+    Fq2 = GF(modulus**2, modulus=z**2-non_residue, names=('u',)); (u,) = Fq2._first_ngens(1)
     PP = Fq2['zz']; (zz,) = PP._first_ngens(1)
     " find quadratic non-residue "
     " not necessiraly the least, can be chosen manually "
