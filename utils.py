@@ -3,6 +3,7 @@
 # Author: Youssef El Housni
 # youssef.el.housni@fr.ey.com / youssef.housni21@gmail.com 
 
+import pystache
 from sage.all_cmdline import *   # import sage library
 import sys
 
@@ -230,7 +231,49 @@ def get_t(family, u):
     else:
         raise Exception('family not supported')
 
+def small_B_twist(E):
+    """
+    Description:
+        
+        Finds a curve isogenous to E that has small B in the curve equation y^2 = x^3 + A*x + B
+    
+    Input:
+    
+        E - elliptic curve
+    
+    Output:
+    
+        E' - elliptic curve isogenous to E that has small B in the curve equation y^2 = x^3 + A*x + B
+    
+    """
+    b = E.ainvs()[4]
+    q = E.base_field().order()
+    b = power_mod(Integer(b), -1, q)
+    d = 0
+    s = Mod(1,q)
+    bool = True
+    while bool:
+        try:
+            d = (s*b)
+            d = d.nth_root(3)
+            d = Integer(d)
+            bool = False
+        except ValueError as e:
+            s+=1 
+            pass
+    ainvs = [i for i in E.ainvs()]
+    ainvs[3] *= d**2
+    ainvs[4] *= d**3
+    return EllipticCurve(E.base_field(), ainvs)
+
+
 # Field utils
+def linearPoly2tab(poly):
+    coeffs_list = poly.polynomial().list()
+    c0 = coeffs_list[0]
+    c1 = 0  if len(coeffs_list)==1  else coeffs_list[1]
+    return c0, c1
+
 def next_power_of_2(x):  
      return 1 if x == 0 else int(log(2 **(x - 1).nbits())/log(2))
 
@@ -299,7 +342,7 @@ def parameters_Fp(modulus):
         mmodulus - integer
 
     Output:
-        modulus, Rsq8, Rcu8, inv8, Rsq4, Rcu4, inv4, num_bits, euler, s, t, t_minus_1_over_2, multiplicative_generator, root_of_unity, nqr, nqr_to_t
+        Rsq8, Rcu8, inv8, Rsq4, Rcu4, inv4, num_bits, euler, s, t, t_minus_1_over_2, multiplicative_generator, root_of_unity, nqr, nqr_to_t
     """ 
     Rsq8, Rcu8, inv8, Rsq4, Rcu4, inv4 = montgomery(modulus) 
     num_bits = modulus.nbits()
@@ -312,7 +355,7 @@ def parameters_Fp(modulus):
     root_of_unity = power_mod(multiplicative_generator, t, modulus)
     nqr = least_quadratic_nonresidue(modulus)
     nqr_to_t = power_mod(nqr, t, modulus)
-    return modulus, Rsq8, Rcu8, inv8, Rsq4, Rcu4, inv4, num_bits, euler, s, t, t_minus_1_over_2, multiplicative_generator, root_of_unity, nqr, nqr_to_t
+    return Rsq8, Rcu8, inv8, Rsq4, Rcu4, inv4, num_bits, euler, s, t, t_minus_1_over_2, multiplicative_generator, root_of_unity, nqr, nqr_to_t
 
 def parameters_Fp2(modulus):
     """
@@ -326,7 +369,7 @@ def parameters_Fp2(modulus):
         mmodulus - integer
 
     Output:
-        euler, s, t, t_minus_1_over_2, non_residue, nqr, nqr_to_t, Frobenius_coeff_C1[0], Frobenius_coeff_C1[1]
+        euler, s, t, t_minus_1_over_2, non_residue, nqr, nqr_to_t, Frobenius_coeff_C1
     """ 
     euler = int((modulus**2-1)/2)
     s = twoAdicity(modulus**2-1)
@@ -346,7 +389,7 @@ def parameters_Fp2(modulus):
         nqr += 1 
     nqr_to_t = nqr**t
     Frobenius_coeff_C1 = lift(Mod(non_residue, modulus)**((modulus**0 -1 )/2 )), lift(Mod(non_residue, modulus)**((modulus**1 -1 )/2 ))
-    return euler, s, t, t_minus_1_over_2, non_residue, nqr, nqr_to_t, Frobenius_coeff_C1[0 ], Frobenius_coeff_C1[1 ]
+    return euler, s, t, t_minus_1_over_2, non_residue, nqr, nqr_to_t, Frobenius_coeff_C1
 
 def parameters_Fp6(modulus, non_residue, coeff_b, r):
     """
@@ -375,12 +418,12 @@ def parameters_Fp6(modulus, non_residue, coeff_b, r):
     Frobenius_coeffs_c2 = []
     mul_by_q = []
     for i in range(6):
-        Frobenius_coeffs_c1.append(nqr**int((modulus**i-1 )/3 ))
+        Frobenius_coeffs_c1.append(nqr**int((modulus**i-1)/3))
     for i in range(6):
-        Frobenius_coeffs_c2.append(nqr**int((2 *modulus**i-2 )/3 ))
+        Frobenius_coeffs_c2.append(nqr**int((2*modulus**i-2)/3))
     "compute mul_by_q for later"
-    mul_by_q.append(Frobenius_coeffs_c1[2 ])
-    mul_by_q.append(nqr**int((modulus**i-1 )/2 ))
+    mul_by_q.append(Frobenius_coeffs_c1[2])
+    mul_by_q.append(nqr**int((modulus**i-1)/2))
     "compute coeff_b_twist for later"
     coeff_b_twist = coeff_b / nqr
     Et = EllipticCurve(Fq2, [0 , coeff_b_twist])
@@ -419,7 +462,7 @@ def parameters_Fp12(modulus, nqr):
         mmodulus - integer
 
     Output:
-        euler, s, t, t_minus_1_over_2, non_residue, nqr, nqr_to_t, Frobenius_coeff_C1[0], Frobenius_coeff_C1[1]
+        non_residue, frobenius_coeffs
     """ 
 
     Frob12_coeff_C1 = []
@@ -427,79 +470,82 @@ def parameters_Fp12(modulus, nqr):
         Frob12_coeff_C1.append(nqr**int((modulus**i-1 )/6 ))
     return nqr, Frob12_coeff_C1
 
-def print_header(curve_name):
-    print('#include <libff/algebra/curves/' + curve_name + '/' + curve_name + '_g1.hpp>')
-    print('#include <libff/algebra/curves/' + curve_name + '/' + curve_name + '_g2.hpp>')
-    print('#include <libff/algebra/curves/' + curve_name + '/' + curve_name + '_init.hpp>\n')
-    print('namespace libff {\n')
-    print('\tbigint<' + curve_name + '_r_limbs> ' + curve_name + '_modulus_r;')
-    print('\tbigint<' + curve_name + '_q_limbs> ' + curve_name + '_modulus_q;\n')
-    print('\t' + curve_name + '_Fq ' + curve_name + '_coeff_b;')
-    print('\t' + curve_name + '_Fq2 ' + curve_name + '_twist;')
-    print('\t' + curve_name + '_Fq2 ' + curve_name + '_twist_coeff_b;')
-    print('\t' + curve_name + '_Fq ' + curve_name + '_twist_mul_by_b_c0;')
-    print('\t' + curve_name + '_Fq ' + curve_name + '_twist_mul_by_b_c1;')
-    print('\t' + curve_name + '_Fq2 ' + curve_name + '_twist_mul_by_q_X;')
-    print('\t' + curve_name + '_Fq2 ' + curve_name + '_twist_mul_by_q_Y;\n')
-    print('\tbigint<' + curve_name + '_q_limbs> ' + curve_name + '_ate_loop_count;')
-    print('\tbool ' + curve_name + '_ate_is_loop_count_neg;')
-    print('\tbigint<12*' + curve_name + '_q_limbs> ' + curve_name + '_final_exponent;') # assumes k=12
-    print('\tbigint<' + curve_name + '_q_limbs> ' + curve_name + '_final_exponent_z;')
-    print('\tbool ' + curve_name + '_final_exponent_is_z_neg;\n')
-    print('\tvoid init_' + curve_name + '_params()')
-    print('\t{')
-    print('\ttypedef bigint<' + curve_name + '_r_limbs> bigint_r;')
-    print('\ttypedef bigint<' + curve_name + '_q_limbs> bigint_q;\n')
-    print('\tassert(sizeof(mp_limb_t) == 8 || sizeof(mp_limb_t) == 4);')
+def pairing_parameters(family, x, q, k, r):
+    if (family == 'bn' or family == 'bw12'):
+        ate_loop_count = 6*x+2 
+    elif (family == 'bls12'):
+        ate_loop_count = x
+    else: 
+        raise Exception("family unknown or not supported")
+    if (ate_loop_count < 0 ): 
+        ate_loop_is_neg = 'true'; 
+    else:
+        ate_loop_is_neg = 'false'; 
+    final_exponent = (q**k-1)/r 
+    if (x<0 ):
+        final_exponent_is_z_neg = 'true'
+    else:
+        final_exponent_is_z_neg = 'false'
+    return ate_loop_count, ate_loop_is_neg, final_exponent, final_exponent_is_z_neg
 
-def print_Fp_parameters(curve_name, field_name, parameters):
-    print('\t\n /* ' + curve_name + ' ' + field_name + ' parameters */\n')
-    print('\t' + curve_name + '_modulus_' + field_name[-1 ] + ' = bigint_' + field_name[-1 ] + '("' + str(parameters[0 ]) + '");')  
-    print('\tassert(' + curve_name + '_' + field_name + '::modulus_is_valid());')
-    print('\tif (sizeof(mp_limb_t) == 8)')
-    print('\t{');
-    print('\t\t' + curve_name + '_' + field_name + '::Rsquared = bigint_' + field_name[-1 ] + '("' + str(parameters[1 ]) + '");')  
-    print('\t\t' + curve_name + '_' + field_name + '::Rcubed = bigint_' + field_name[-1 ] + '("' + str(parameters[2 ]) + '");')  
-    print('\t\t' + curve_name + '_' + field_name + '::inv = 0x' + str(parameters[3 ]) + ';')  
-    print('\t}');
-    print('\tif (sizeof(mp_limb_t) == 4)')
-    print('\t{');
-    print('\t' + curve_name + '_' + field_name + '::Rsquared = bigint_' + field_name[-1 ] + '("' + str(parameters[4 ]) + '");')  
-    print('\t' + curve_name + '_' + field_name + '::Rcubed = bigint_' + field_name[-1 ] + '("' + str(parameters[5 ]) + '");')  
-    print('\t' + curve_name + '_' + field_name + '::inv = 0x' + str(parameters[6 ]) + ';')  
-    print('\t}');
-    print('\t' + curve_name + '_' + field_name + '::num_bits = ' + str(parameters[7 ]) + ';')  
-    print('\t' + curve_name + '_' + field_name + '::euler = bigint_' + field_name[-1 ] + '("' + str(parameters[8 ]) + '");')  
-    print('\t' + curve_name + '_' + field_name + '::s = ' + str(parameters[9 ]) + '; ')  
-    print('\t' + curve_name + '_' + field_name + '::t = bigint_' + field_name[-1 ] + '("' + str(parameters[10 ]) + '");')  
-    print('\t' + curve_name + '_' + field_name + '::t_minus_1_over_2 = bigint_' + field_name[-1 ] + '("' + str(parameters[11 ]) + '");')  
-    print('\t' + curve_name + '_' + field_name + '::multiplicative_generator = ' + curve_name + '_' + field_name + '("' + str(parameters[12 ]) + '");')  
-    print('\t' + curve_name + '_' + field_name + '::root_of_unity = ' + curve_name + '_' + field_name + '("' + str(parameters[13 ]) + '");')  
-    print('\t' + curve_name + '_' + field_name + '::nqr = ' + curve_name + '_' + field_name + '("' + str(parameters[14 ]) + '"); ')  
-    print('\t' + curve_name + '_' + field_name + '::nqr_to_t = ' + curve_name + '_' + field_name + '("' + str(parameters[15 ]) + '");')
-
-def print_Fp2_parameters(curve_name, parameters):
-    print('\t\n /* ' + curve_name + ' Fq2' + ' parameters */\n')
-    print('\t'  +curve_name + '_Fq2::euler = bigint<2*' + curve_name + '_q_limbs>("' + str(parameters[0 ]) + '");')
-    print('\t'  +curve_name + '_Fq2::s = ' + str(parameters[1 ]) + ';')
-    print('\t'  +curve_name + '_Fq2::t = bigint<2*' + curve_name + '_q_limbs>("' + str(parameters[2 ]) + '");')
-    print('\t'  +curve_name + '_Fq2::t_minus_1_over_2 = bigint<2*' + curve_name + '_q_limbs>("' + str(parameters[3 ]) + '");')
-    print('\t'  +curve_name + '_Fq2::non_residue = ' + curve_name + '_Fq("' + str(parameters[4 ]) + '");')
-    print('\t'  +curve_name + '_Fq2::nqr = ' + curve_name + '_Fq2(' + curve_name + '_Fq("' + str(parameters[5 ].polynomial().list()[0 ]) + '"),' + curve_name + '_Fq("' + str(0  if len(parameters[5 ].polynomial().list())==1  else parameters[5 ].polynomial().list()[1 ]) + '"));')
-    print('\t'  +curve_name + '_Fq2::nqr_to_t = ' + curve_name + '_Fq2(' + curve_name + '_Fq("' + str(parameters[6 ].polynomial().list()[0 ]) + '"),' + curve_name + '_Fq("' + str(0  if len(parameters[6 ].polynomial().list())==1  else parameters[6 ].polynomial().list()[1 ]) + '"));')
-    print('\t'  +curve_name + '_Fq2::Frobenius_coeffs_c1[0] = ' + curve_name + '_Fq("' + str(parameters[7 ]) + '");')
-    print('\t'  +curve_name + '_Fq2::Frobenius_coeffs_c1[1] = ' + curve_name + '_Fq("' + str(parameters[8 ]) + '");')
-
-def print_Fp6_parameters(curve_name, parameters):
-    print('\t\n /* ' + curve_name + ' Fq6' + ' parameters */\n')
-    print('\t' + curve_name + '_Fq2::non_residue = ' + curve_name + '_Fq2(' + curve_name + '_Fq("' + str(parameters[0 ].polynomial().list()[0 ]) + '"),' + curve_name + '_Fq("' + str(0  if len(parameters[0 ].polynomial().list())==1  else parameters[0 ].polynomial().list()[1 ]) + '"));')
-    for i in range(6 ):
-        print('\t' + curve_name + '_Fq2::Frobenius_coeffs_c1[' + str(i) + '] = '  + curve_name + '_Fq2(' + curve_name + '_Fq("' + str(parameters[1 ][i].polynomial().list()[0 ]) + '"),' + curve_name + '_Fq("' + str(0  if len(parameters[1 ][i].polynomial().list())==1  else parameters[1 ][i].polynomial().list()[1 ]) + '"));')
-    for i in range(6 ):
-        print('\t' + curve_name + '_Fq2::Frobenius_coeffs_c2[' + str(i) + '] = '  + curve_name + '_Fq2(' + curve_name + '_Fq("' + str(parameters[2 ][i].polynomial().list()[0 ]) + '"),' + curve_name + '_Fq("' + str(0  if len(parameters[2 ][i].polynomial().list())==1  else parameters[2 ][i].polynomial().list()[1 ]) + '"));')
-
-def print_Fp12_parameters(curve_name, parameters):
-    print('\t\n /* ' + curve_name + ' Fq12' + ' parameters */\n')
-    print('\t' + curve_name + '_Fq2::non_residue = ' + curve_name + '_Fq2(' + curve_name + '_Fq("' + str(parameters[0 ].polynomial().list()[0 ]) + '"),' + curve_name + '_Fq("' + str(0  if len(parameters[0 ].polynomial().list())==1  else parameters[0 ].polynomial().list()[1 ]) + '"));')
-    for i in range(12 ):
-        print('\t' + curve_name + '_Fq2::Frobenius_coeffs_c1[' + str(i) + '] = '  + curve_name + '_Fq2(' + curve_name + '_Fq("' + str(parameters[1 ][i].polynomial().list()[0 ]) + '"),' + curve_name + '_Fq("' + str(0  if len(parameters[1 ][i].polynomial().list())==1  else parameters[1 ][i].polynomial().list()[1 ]) + '"));')
+def print_to_libff(curve_name, curve_family, modulus_r, R2_64_r, R3_64_r, inv_64_r, R2_32_r, R3_32_r, inv_32_r, num_bits_r, euler_r, s_r, t_r, t_minus_1_over_2_r, multiplicative_generator_r, root_of_unity_r, nqr_r, nqr_to_t_r, R2_64_q, R3_64_q, inv_64_q, modulus_q, R2_32_q, R3_32_q, inv_32_q, num_bits_q, euler_q, s_q, t_q, t_minus_1_over_2_q, multiplicative_generator_q, root_of_unity_q, nqr_q, nqr_to_t_q, euler_q2, s_q2, t_q2, t_minus_1_over_2_q2, non_residue_q2, nqr_q2, nqr_to_t_q2, frobenius_q2, non_residue_q6, frobenius_q6_1, frobenius_q6_2, mul_by_q, twist_coeff_b, twist_type, G1_one, G2_one, non_residue_q12, frobenius_q12, ate_loop_count, ate_loop_count_bool, final_exponent, x_bool):
+    renderer = pystache.Renderer()
+    print(renderer.render_path('./templates/init.mustache', 
+        {'curve_name': curve_name},
+        {'curve_family': curve_family},
+        {'modulus_r': modulus_r},
+        {'R2_64_r': R2_64_r},
+        {'R3_64_r': R3_64_r},
+        {'inv_64_r': inv_64_r},
+        {'R2_32_r': R2_32_r},
+        {'R3_32_r': R3_32_r},
+        {'inv_32_r': inv_32_r},
+        {'num_bits_r': num_bits_r},
+        {'euler_r': euler_r},
+        {'s_r': s_r},
+        {'t_r': t_r},
+        {'t_minus_1_over_2_r': t_minus_1_over_2_r},
+        {'multiplicative_generator_r': multiplicative_generator_r},
+        {'root_of_unity_r': root_of_unity_r},
+        {'nqr_r': nqr_r},
+        {'nqr_to_t_r':  nqr_to_t_r},
+        {'modulus_q': modulus_q},
+        {'R2_64_q': R2_64_q},
+        {'R3_64_q': R3_64_q},
+        {'inv_64_q': inv_64_q},
+        {'R2_32_q': R2_32_q},
+        {'R3_32_q': R3_32_q},
+        {'inv_32_q': inv_32_q},
+        {'num_bits_q': num_bits_q},
+        {'euler_q': euler_q},
+        {'s_q': s_q},
+        {'t_q': t_q},
+        {'t_minus_1_over_2_q': t_minus_1_over_2_q},
+        {'multiplicative_generator_q': multiplicative_generator_q},
+        {'root_of_unity_q': root_of_unity_q},
+        {'nqr_q': nqr_q},
+        {'nqr_to_t_q':  nqr_to_t_q},
+        {'euler_q2': euler_q2},
+        {'s_q2': s_q2},
+        {'t_q2': t_q2},
+        {'t_minus_1_over_2_q2': t_minus_1_over_2_q2}))
+    """
+        {'non_residue_q2': non_residue_q2},
+        {'nqr_q2': nqr_q2},
+        {'nqr_to_t_q2': nqr_to_t_q2},
+        {'frobenius_q2': frobenius_q2},
+        {'non_residue_q6': non_residue_q6},
+        {'frobenius_q6_1': frobenius_q6_1},
+        {'frobenius_q6_2': frobenius_q6_2},
+        {'mul_by_q': mul_by_q},
+        {'twist_coeff_b': twist_coeff_b},
+        {'twist_type': twist_type},
+        {'G1_one': G1_one},
+        {'G2_one': G2_one},
+        {'non_residue_q12': non_residue_q12},
+        {'frobenius_q12': frobenius_q12},
+        {'ate_loop_count': ate_loop_count},
+        {'ate_loop_count_bool': ate_loop_count_bool},
+        {'final_exponent': final_exponent},
+        {'x_bool': x_bool}))
+    """
