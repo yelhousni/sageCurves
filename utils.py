@@ -6,6 +6,7 @@
 import pystache
 from sage.all_cmdline import *   # import sage library
 import sys
+import os
 
 #TODO: for BN 'friendly' curves write coeff_b as c^4+d^6 or c^6+4d^4 and most parameters follow easily
 
@@ -488,9 +489,16 @@ def pairing_parameters(family, x, q, k, r):
         final_exponent_is_z_neg = 'false'
     return ate_loop_count, ate_loop_is_neg, final_exponent, final_exponent_is_z_neg
 
-def print_to_libff(curve_name, curve_family, modulus_r, R2_64_r, R3_64_r, inv_64_r, R2_32_r, R3_32_r, inv_32_r, num_bits_r, euler_r, s_r, t_r, t_minus_1_over_2_r, multiplicative_generator_r, root_of_unity_r, nqr_r, nqr_to_t_r, modulus_q, R2_64_q, R3_64_q, inv_64_q, R2_32_q, R3_32_q, inv_32_q, num_bits_q, euler_q, s_q, t_q, t_minus_1_over_2_q, multiplicative_generator_q, root_of_unity_q, nqr_q, nqr_to_t_q, euler_q2, s_q2, t_q2, t_minus_1_over_2_q2, non_residue_q2, nqr_q2, nqr_to_t_q2, frobenius_q2, non_residue_q6, frobenius_q6_1, frobenius_q6_2, mul_by_q, coeff_b, twist_coeff_b, twist_type, G1_one, G2_one, non_residue_q12, frobenius_q12, ate_loop_count, ate_loop_count_bool, final_exponent, poly_u, x_bool):
+# fill in templates
+def fill_in_libff_templates(outdir, curve_name, curve_family, modulus_r, R2_64_r, R3_64_r, inv_64_r, R2_32_r, R3_32_r, inv_32_r, num_bits_r, euler_r, s_r, t_r, t_minus_1_over_2_r, multiplicative_generator_r, root_of_unity_r, nqr_r, nqr_to_t_r, modulus_q, R2_64_q, R3_64_q, inv_64_q, R2_32_q, R3_32_q, inv_32_q, num_bits_q, euler_q, s_q, t_q, t_minus_1_over_2_q, multiplicative_generator_q, root_of_unity_q, nqr_q, nqr_to_t_q, euler_q2, s_q2, t_q2, t_minus_1_over_2_q2, non_residue_q2, nqr_q2, nqr_to_t_q2, frobenius_q2, non_residue_q6, frobenius_q6_1, frobenius_q6_2, mul_by_q, coeff_b, twist_coeff_b, twist_type, G1_one, G2_one, non_residue_q12, frobenius_q12, ate_loop_count, ate_loop_count_bool, final_exponent, poly_u, x_bool):
+    if not os.path.exists(outdir):
+        try:
+            os.makedir(outdir)
+        except:
+            raise OSError("Can't create destination directory (%s)!" % (outdir))
     renderer = pystache.Renderer()
-    print(renderer.render_path('./templates/init.mustache', 
+    init_cpp = open(outdir + '/' + curve_name + '_init.cpp', 'w')
+    init_cpp.write(renderer.render_path('./templates/init_cpp.mustache', 
         {'curve_name': curve_name},
         {'curve_family': curve_family},
         {'modulus_r': modulus_r},
@@ -609,3 +617,83 @@ def print_to_libff(curve_name, curve_family, modulus_r, R2_64_r, R3_64_r, inv_64
         {'final_exponent': final_exponent},
         {'poly_u': poly_u},
         {'x_bool': x_bool}))
+    init_cpp.close()
+    init_hpp = open(outdir + '/' + curve_name + '_init.hpp', 'w')
+    init_hpp.write(renderer.render_path('./templates/init_hpp.mustache', 
+        {'curve_name': curve_name},
+        {'curve_name_maj': curve_name.upper()},
+        {'num_bits_r': num_bits_r},
+        {'num_bits_q': num_bits_q}))
+    init_hpp.close()
+    g1_cpp = open(outdir + '/' + curve_name + '_g1.cpp', 'w')
+    g1_cpp.write(renderer.render_path('./templates/g1_cpp.mustache', 
+        {'curve_name': curve_name},
+        {'curve_name_maj': curve_name.upper()}))
+    g1_cpp.close()
+    g1_hpp = open(outdir + '/' + curve_name + '_g1.hpp', 'w')
+    g1_hpp.write(renderer.render_path('./templates/g1_hpp.mustache', 
+        {'curve_name': curve_name},
+        {'curve_name_maj': curve_name.upper()}))
+    g1_hpp.close()
+    g2_cpp = open(outdir + '/' + curve_name + '_g2.cpp', 'w')
+    g2_cpp.write(renderer.render_path('./templates/g2_cpp.mustache', 
+        {'curve_name': curve_name},
+        {'curve_name_maj': curve_name.upper()}))
+    g2_cpp.close()
+    g2_hpp = open(outdir + '/' + curve_name + '_g2.hpp', 'w')
+    g2_hpp.write(renderer.render_path('./templates/g2_hpp.mustache', 
+        {'curve_name': curve_name},
+        {'curve_name_maj': curve_name.upper()}))
+    g2_hpp.close()
+    pp_cpp = open(outdir + '/' + curve_name + '_pp.cpp', 'w')
+    pp_cpp.write(renderer.render_path('./templates/pp_cpp.mustache', 
+        {'curve_name': curve_name},
+        {'curve_name_maj': curve_name.upper()}))
+    pp_cpp.close()
+    pp_hpp = open(outdir + '/' + curve_name + '_pp.hpp', 'w')
+    pp_hpp.write(renderer.render_path('./templates/pp_hpp.mustache', 
+        {'curve_name': curve_name},
+        {'curve_name_maj': curve_name.upper()}))
+    pp_hpp.close()
+    pairing_hpp = open(outdir + '/' + curve_name + '_pairing.hpp', 'w')
+    pairing_hpp.write(renderer.render_path('./templates/pairing_hpp.mustache', 
+        {'curve_name': curve_name},
+        {'curve_name_maj': curve_name.upper()}))
+    pairing_hpp.close()
+    pairing_cpp = open(outdir + '/' + curve_name + '_pairing.cpp', 'w')
+    if (curve_family == 'bn'):
+        if (twist_type == 'D'):
+            pairing_cpp.write(renderer.render_path('./templates/pairing_bn_D_cpp.mustache',
+                {'curve_name': curve_name},
+                {'curve_name_maj': curve_name.upper()}))
+        elif (twist_type == 'M'):
+            pairing_cpp.write(renderer.render_path('./templates/pairing_bn_M_cpp.mustache', 
+                {'curve_name': curve_name},
+                {'curve_name_maj': curve_name.upper()}))
+        else:
+            raise Exception('unvalid twist type')
+    elif (curve_family == 'bls12'):
+        if (twist_type == 'D'):
+            pairing_cpp.write(renderer.render_path('./templates/pairing_bls12_D_cpp.mustache', 
+                {'curve_name': curve_name},
+                {'curve_name_maj': curve_name.upper()}))
+        elif (twist_type == 'M'):
+            pairing_cpp.write(renderer.render_path('./templates/pairing_bls12_M_cpp.mustache', 
+                {'curve_name': curve_name},
+                {'curve_name_maj': curve_name.upper()}))
+        else:
+            raise Exception('unvalid twist type')
+    elif (curve_family == 'bw12'):
+        if (twist_type == 'D'):
+            pairing_cpp.write(renderer.render_path('./templates/pairing_bw12_D_cpp.mustache', 
+                {'curve_name': curve_name},
+                {'curve_name_maj': curve_name.upper()}))
+        elif (twist_type == 'M'):
+            pairing_cpp.write(renderer.render_path('./templates/pairing_bw12_M_cpp.mustache', 
+                {'curve_name': curve_name},
+                {'curve_name_maj': curve_name.upper()}))
+        else:
+            raise Exception('unvalid twist type')
+    else:
+        raise Exception('curve_family is not supported')
+    pairing_cpp.close()

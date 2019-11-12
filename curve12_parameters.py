@@ -25,9 +25,10 @@ def help():
     print('')
 	
 def main():
-    if (len(sys.argv) != 2): sys.exit(help())
+    if (len(sys.argv) != 3): sys.exit(help())
     try:
         curveFile = sys.argv[1]
+        outdir = sys.argv[2]
         with open(curveFile, 'r') as f:
             lines = f.readlines()
             curve_family = lines[0].split(":")[0]
@@ -36,7 +37,6 @@ def main():
 
         # Curve
         modulus_q = get_q(curve_family, poly_u)
-        print(modulus_q)
         frobenius_trace = get_t(curve_family, poly_u)
         modulus_r = get_r(curve_family, poly_u)
         embedding_degree = Integer(12)
@@ -64,7 +64,7 @@ def main():
         ate_loop_count, ate_loop_count_bool, final_exponent, x_bool = pairing_parameters(curve_family, poly_u, modulus_q, embedding_degree, modulus_r)
 
         # print to libff
-        print_to_libff(curve_name, curve_family, modulus_r, R2_64_r, R3_64_r, inv_64_r, R2_32_r, R3_32_r, inv_32_r, num_bits_r, euler_r, s_r, t_r, t_minus_1_over_2_r, multiplicative_generator_r, root_of_unity_r, nqr_r, nqr_to_t_r, modulus_q, R2_64_q, R3_64_q, inv_64_q, R2_32_q, R3_32_q, inv_32_q, num_bits_q, euler_q, s_q, t_q, t_minus_1_over_2_q, multiplicative_generator_q, root_of_unity_q, nqr_q, nqr_to_t_q, euler_q2, s_q2, t_q2, t_minus_1_over_2_q2, non_residue_q2, nqr_q2, nqr_to_t_q2, frobenius_q2, non_residue_q6, frobenius_q6_1, frobenius_q6_2, mul_by_q, coeff_b, twist_coeff_b, twist_type, G1_one, G2_one, non_residue_q12, frobenius_q12, ate_loop_count, ate_loop_count_bool, final_exponent, poly_u, x_bool)
+        fill_in_libff_templates(outdir, curve_name, curve_family, modulus_r, R2_64_r, R3_64_r, inv_64_r, R2_32_r, R3_32_r, inv_32_r, num_bits_r, euler_r, s_r, t_r, t_minus_1_over_2_r, multiplicative_generator_r, root_of_unity_r, nqr_r, nqr_to_t_r, modulus_q, R2_64_q, R3_64_q, inv_64_q, R2_32_q, R3_32_q, inv_32_q, num_bits_q, euler_q, s_q, t_q, t_minus_1_over_2_q, multiplicative_generator_q, root_of_unity_q, nqr_q, nqr_to_t_q, euler_q2, s_q2, t_q2, t_minus_1_over_2_q2, non_residue_q2, nqr_q2, nqr_to_t_q2, frobenius_q2, non_residue_q6, frobenius_q6_1, frobenius_q6_2, mul_by_q, coeff_b, twist_coeff_b, twist_type, G1_one, G2_one, non_residue_q12, frobenius_q12, ate_loop_count, ate_loop_count_bool, final_exponent, poly_u, x_bool)
 
     except Exception as e:
         sys.exit(e)

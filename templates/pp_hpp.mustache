@@ -1,0 +1,43 @@
+#ifndef {{curve_name_maj}}_PP_HPP_
+#define {{curve_name_maj}}_PP_HPP_
+#include <libff/algebra/curves/{{curve_name}}/{{curve_name}}_g1.hpp>
+#include <libff/algebra/curves/{{curve_name}}/{{curve_name}}_g2.hpp>
+#include <libff/algebra/curves/{{curve_name}}/{{curve_name}}_init.hpp>
+#include <libff/algebra/curves/{{curve_name}}/{{curve_name}}_pairing.hpp>
+#include <libff/algebra/curves/public_params.hpp>
+
+namespace libff {
+
+class {{curve_name}}_pp {
+public:
+    typedef {{curve_name}}_Fr Fp_type;
+    typedef {{curve_name}}_G1 G1_type;
+    typedef {{curve_name}}_G2 G2_type;
+    typedef {{curve_name}}_G1_precomp G1_precomp_type;
+    typedef {{curve_name}}_G2_precomp G2_precomp_type;
+    typedef {{curve_name}}_Fq Fq_type;
+    typedef {{curve_name}}_Fq2 Fqe_type;
+    typedef {{curve_name}}_Fq12 Fqk_type;
+    typedef {{curve_name}}_GT GT_type;
+
+    static const bool has_affine_pairing = false;
+
+    static void init_public_params();
+    static {{curve_name}}_GT final_exponentiation(const {{curve_name}}_Fq12 &elt);
+    static {{curve_name}}_G1_precomp precompute_G1(const {{curve_name}}_G1 &P);
+    static {{curve_name}}_G2_precomp precompute_G2(const {{curve_name}}_G2 &Q);
+    static {{curve_name}}_Fq12 miller_loop(const {{curve_name}}_G1_precomp &prec_P,
+                                      const {{curve_name}}_G2_precomp &prec_Q);
+    static {{curve_name}}_Fq12 double_miller_loop(const {{curve_name}}_G1_precomp &prec_P1,
+                                             const {{curve_name}}_G2_precomp &prec_Q1,
+                                             const {{curve_name}}_G1_precomp &prec_P2,
+                                             const {{curve_name}}_G2_precomp &prec_Q2);
+    static {{curve_name}}_Fq12 pairing(const {{curve_name}}_G1 &P,
+                                  const {{curve_name}}_G2 &Q);
+    static {{curve_name}}_Fq12 reduced_pairing(const {{curve_name}}_G1 &P,
+                                          const {{curve_name}}_G2 &Q);
+};
+
+} // libff
+
+#endif // {{curve_name_maj}}_PP_HPP_

@@ -1,0 +1,86 @@
+#ifndef {{curve_name_maj}}_PAIRING_HPP_
+#define {{curve_name_maj}}_PAIRING_HPP_
+#include <vector>
+
+#include <libff/algebra/curves/{{curve_name}}/{{curve_name}}_init.hpp>
+
+namespace libff {
+
+/* final exponentiation */
+
+{{curve_name}}_GT {{curve_name}}_final_exponentiation(const {{curve_name}}_Fq12 &elt);
+
+/* ate pairing */
+
+struct {{curve_name}}_ate_G1_precomp {
+    {{curve_name}}_Fq PX;
+    {{curve_name}}_Fq PY;
+
+    bool operator==(const {{curve_name}}_ate_G1_precomp &other) const;
+    friend std::ostream& operator<<(std::ostream &out, const {{curve_name}}_ate_G1_precomp &prec_P);
+    friend std::istream& operator>>(std::istream &in, {{curve_name}}_ate_G1_precomp &prec_P);
+};
+
+struct {{curve_name}}_ate_ell_coeffs {
+    {{curve_name}}_Fq2 ell_0;
+    {{curve_name}}_Fq2 ell_VW;
+    {{curve_name}}_Fq2 ell_VV;
+
+    bool operator==(const {{curve_name}}_ate_ell_coeffs &other) const;
+    friend std::ostream& operator<<(std::ostream &out, const {{curve_name}}_ate_ell_coeffs &dc);
+    friend std::istream& operator>>(std::istream &in, {{curve_name}}_ate_ell_coeffs &dc);
+};
+
+struct {{curve_name}}_ate_G2_precomp {
+    {{curve_name}}_Fq2 QX;
+    {{curve_name}}_Fq2 QY;
+    std::vector<{{curve_name}}_ate_ell_coeffs> coeffs;
+
+    bool operator==(const {{curve_name}}_ate_G2_precomp &other) const;
+    friend std::ostream& operator<<(std::ostream &out, const {{curve_name}}_ate_G2_precomp &prec_Q);
+    friend std::istream& operator>>(std::istream &in, {{curve_name}}_ate_G2_precomp &prec_Q);
+};
+
+{{curve_name}}_ate_G1_precomp {{curve_name}}_ate_precompute_G1(const {{curve_name}}_G1& P);
+{{curve_name}}_ate_G2_precomp {{curve_name}}_ate_precompute_G2(const {{curve_name}}_G2& Q);
+
+{{curve_name}}_Fq12 {{curve_name}}_ate_miller_loop(const {{curve_name}}_ate_G1_precomp &prec_P,
+                              const {{curve_name}}_ate_G2_precomp &prec_Q);
+{{curve_name}}_Fq12 {{curve_name}}_ate_double_miller_loop(const {{curve_name}}_ate_G1_precomp &prec_P1,
+                                     const {{curve_name}}_ate_G2_precomp &prec_Q1,
+                                     const {{curve_name}}_ate_G1_precomp &prec_P2,
+                                     const {{curve_name}}_ate_G2_precomp &prec_Q2);
+
+{{curve_name}}_Fq12 {{curve_name}}_ate_pairing(const {{curve_name}}_G1& P,
+                          const {{curve_name}}_G2 &Q);
+{{curve_name}}_GT {{curve_name}}_ate_reduced_pairing(const {{curve_name}}_G1 &P,
+                                 const {{curve_name}}_G2 &Q);
+
+/* choice of pairing */
+
+typedef {{curve_name}}_ate_G1_precomp {{curve_name}}_G1_precomp;
+typedef {{curve_name}}_ate_G2_precomp {{curve_name}}_G2_precomp;
+
+{{curve_name}}_G1_precomp {{curve_name}}_precompute_G1(const {{curve_name}}_G1& P);
+
+{{curve_name}}_G2_precomp {{curve_name}}_precompute_G2(const {{curve_name}}_G2& Q);
+
+{{curve_name}}_Fq12 {{curve_name}}_miller_loop(const {{curve_name}}_G1_precomp &prec_P,
+                          const {{curve_name}}_G2_precomp &prec_Q);
+
+{{curve_name}}_Fq12 {{curve_name}}_double_miller_loop(const {{curve_name}}_G1_precomp &prec_P1,
+                                 const {{curve_name}}_G2_precomp &prec_Q1,
+                                 const {{curve_name}}_G1_precomp &prec_P2,
+                                 const {{curve_name}}_G2_precomp &prec_Q2);
+
+{{curve_name}}_Fq12 {{curve_name}}_pairing(const {{curve_name}}_G1& P,
+                      const {{curve_name}}_G2 &Q);
+
+{{curve_name}}_GT {{curve_name}}_reduced_pairing(const {{curve_name}}_G1 &P,
+                             const {{curve_name}}_G2 &Q);
+
+{{curve_name}}_GT {{curve_name}}_affine_reduced_pairing(const {{curve_name}}_G1 &P,
+                                    const {{curve_name}}_G2 &Q);
+
+} // libff
+#endif // {{curve_name_maj}}_PAIRING_HPP_
