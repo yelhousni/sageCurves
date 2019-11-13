@@ -4,25 +4,25 @@
 
 namespace libff {
 
-	bigint<{{curve_name}}_r_limbs> {{curve_name}}_modulus_r;
-	bigint<{{curve_name}}_q_limbs> {{curve_name}}_modulus_q;
+bigint<{{curve_name}}_r_limbs> {{curve_name}}_modulus_r;
+bigint<{{curve_name}}_q_limbs> {{curve_name}}_modulus_q;
 
-	{{curve_name}}_Fq {{curve_name}}_coeff_b;
-	{{curve_name}}_Fq2 {{curve_name}}_twist;
-	{{curve_name}}_Fq2 {{curve_name}}_twist_coeff_b;
-	{{curve_name}}_Fq {{curve_name}}_twist_mul_by_b_c0;
-	{{curve_name}}_Fq {{curve_name}}_twist_mul_by_b_c1;
-	{{curve_name}}_Fq2 {{curve_name}}_twist_mul_by_q_X;
-	{{curve_name}}_Fq2 {{curve_name}}_twist_mul_by_q_Y;
+{{curve_name}}_Fq {{curve_name}}_coeff_b;
+{{curve_name}}_Fq2 {{curve_name}}_twist;
+{{curve_name}}_Fq2 {{curve_name}}_twist_coeff_b;
+{{curve_name}}_Fq {{curve_name}}_twist_mul_by_b_c0;
+{{curve_name}}_Fq {{curve_name}}_twist_mul_by_b_c1;
+{{curve_name}}_Fq2 {{curve_name}}_twist_mul_by_q_X;
+{{curve_name}}_Fq2 {{curve_name}}_twist_mul_by_q_Y;
 
-	bigint<{{curve_name}}_q_limbs> {{curve_name}}_ate_loop_count;
-	bool {{curve_name}}_ate_is_loop_count_neg;
-	bigint<12*{{curve_name}}_q_limbs> {{curve_name}}_final_exponent;
-	bigint<{{curve_name}}_q_limbs> {{curve_name}}_final_exponent_z;
-	bool {{curve_name}}_final_exponent_is_z_neg;
+bigint<{{curve_name}}_q_limbs> {{curve_name}}_ate_loop_count;
+bool {{curve_name}}_ate_is_loop_count_neg;
+bigint<12*{{curve_name}}_q_limbs> {{curve_name}}_final_exponent;
+bigint<{{curve_name}}_q_limbs> {{curve_name}}_final_exponent_z;
+bool {{curve_name}}_final_exponent_is_z_neg;
 
-	void init_{{curve_name}}_params()
-	{
+void init_{{curve_name}}_params()
+{
 	typedef bigint<{{curve_name}}_r_limbs> bigint_r;
 	typedef bigint<{{curve_name}}_q_limbs> bigint_q;
 
@@ -94,44 +94,45 @@ namespace libff {
 	
      /* {{curve_name}} Fq6 parameters */
 
-	{{curve_name}}_Fq2::non_residue = {{curve_name}}_Fq2({{curve_name}}_Fq("{{non_residue_q6_c0}}"),{{curve_name}}_Fq("{{non_residue_q6_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c1[0] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_10_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_10_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c1[1] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_11_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_11_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c1[2] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_12_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_12_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c1[3] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_13_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_13_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c1[4] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_14_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_14_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c1[5] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_15_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_15_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c2[0] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_20_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_20_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c2[1] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_21_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_21_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c2[2] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_22_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_22_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c2[3] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_23_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_23_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c2[4] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_24_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_24_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c2[5] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_25_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_25_c1}}"));
+	{{curve_name}}_Fq6::non_residue = {{curve_name}}_Fq2({{curve_name}}_Fq("{{non_residue_q6_c0}}"),{{curve_name}}_Fq("{{non_residue_q6_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c1[0] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_10_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_10_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c1[1] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_11_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_11_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c1[2] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_12_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_12_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c1[3] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_13_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_13_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c1[4] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_14_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_14_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c1[5] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_15_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_15_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c2[0] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_20_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_20_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c2[1] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_21_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_21_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c2[2] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_22_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_22_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c2[3] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_23_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_23_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c2[4] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_24_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_24_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c2[5] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_25_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_25_c1}}"));
 	
      /* {{curve_name}} Fq12 parameters */
 
-	{{curve_name}}_Fq2::non_residue = {{curve_name}}_Fq2({{curve_name}}_Fq("{{non_residue_q12_c0}}"),{{curve_name}}_Fq("{{non_residue_q12_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c1[0] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_0_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_0_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c1[1] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_1_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_1_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c1[2] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_2_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_2_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c1[3] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_3_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_3_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c1[4] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_4_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_4_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c1[5] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_5_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_5_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c1[6] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_6_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_6_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c1[7] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_7_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_7_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c1[8] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_8_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_8_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c1[9] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_9_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_9_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c1[10] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_10_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_10_c1}}"));
-	{{curve_name}}_Fq2::Frobenius_coeffs_c1[11] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_11_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_11_c1}}"));
+	{{curve_name}}_Fq12::non_residue = {{curve_name}}_Fq2({{curve_name}}_Fq("{{non_residue_q12_c0}}"),{{curve_name}}_Fq("{{non_residue_q12_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[0] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_0_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_0_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[1] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_1_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_1_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[2] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_2_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_2_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[3] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_3_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_3_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[4] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_4_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_4_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[5] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_5_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_5_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[6] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_6_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_6_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[7] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_7_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_7_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[8] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_8_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_8_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[9] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_9_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_9_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[10] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_10_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_10_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[11] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_11_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_11_c1}}"));
 	
     /* choice of short Weierstrass curve and its twist */
 
 	{{curve_name}}_coeff_b = {{curve_name}}_Fq("{{coeff_b}}");
-	{{curve_name}}_twist_coeff_b = {{curve_name}}_Fq2({{curve_name}}_Fq("{{twist_coeff_b_c0}}"),{{curve_name}}_Fq("{{twist_coeff_b_c1}}");
-	{{curve_name}}_twist_mul_by_c0 = {{curve_name}}_coeff_b * {{curve_name}}_Fq2::non_residue;
-	{{curve_name}}_twist_mul_by_c1 = {{curve_name}}_coeff_b * {{curve_name}}_Fq2::non_residue;
-	{{curve_name}}_twist_mul_by_q_X = {{curve_name}}_Fq2({{curve_name}}_Fq("{{mul_by_q_0_c0}}"),{{curve_name}}_Fq("{{mul_by_q_0_c1}}");
-	{{curve_name}}_twist_mul_by_q_Y = {{curve_name}}_Fq2({{curve_name}}_Fq("{{mul_by_q_1_c0}}"),{{curve_name}}_Fq("{{mul_by_q_1_c1}}");
+	{{curve_name}}_twist = {{curve_name}}_Fq2({{curve_name}}_Fq("{{non_residue_q12_c0}}"),{{curve_name}}_Fq("{{non_residue_q12_c1}}"));
+	{{curve_name}}_twist_coeff_b = {{curve_name}}_Fq2({{curve_name}}_Fq("{{twist_coeff_b_c0}}"),{{curve_name}}_Fq("{{twist_coeff_b_c1}}"));
+	{{curve_name}}_twist_mul_by_b_c0 = {{curve_name}}_coeff_b * {{curve_name}}_Fq2::non_residue;
+	{{curve_name}}_twist_mul_by_b_c1 = {{curve_name}}_coeff_b * {{curve_name}}_Fq2::non_residue;
+	{{curve_name}}_twist_mul_by_q_X = {{curve_name}}_Fq2({{curve_name}}_Fq("{{mul_by_q_0_c0}}"),{{curve_name}}_Fq("{{mul_by_q_0_c1}}"));
+	{{curve_name}}_twist_mul_by_q_Y = {{curve_name}}_Fq2({{curve_name}}_Fq("{{mul_by_q_1_c0}}"),{{curve_name}}_Fq("{{mul_by_q_1_c1}}"));
 	
     /* choice of group G1 */
 
@@ -139,8 +140,8 @@ namespace libff {
                                                    {{curve_name}}_Fq::one(),
                                                    {{curve_name}}_Fq::zero());
 	{{curve_name}}_G1::G1_one = {{curve_name}}_G1({{curve_name}}_Fq("{{G1_one_x}}"),
-                                                  {{curve_name}} _Fq("{{G1_one_y}}"),
-                                                  {{curve_name}}_Fq::zero());
+                                                  {{curve_name}}_Fq("{{G1_one_y}}"),
+                                                  {{curve_name}}_Fq::one());
 
     // TODO
 	{{curve_name}}_G1::wnaf_window_table.resize(0);
@@ -204,7 +205,7 @@ namespace libff {
                                                                      {{curve_name}}_Fq("{{G2_one_x_c1}}")),
                                                   {{curve_name}}_Fq2({{curve_name}}_Fq("{{G2_one_y_c0}}"),
                                                                      {{curve_name}}_Fq("{{G2_one_y_c1}}")),
-                                                  {{curve_name}}Fq2::one()));
+                                                  {{curve_name}}_Fq2::one());
     // TODO
 	{{curve_name}}_G2::wnaf_window_table.resize(0);
     {{curve_name}}_G2::wnaf_window_table.push_back(5);
@@ -261,7 +262,10 @@ namespace libff {
     /* choice of pairing */
 
 	{{curve_name}}_ate_loop_count = bigint_q("{{ate_loop_count}}");
-	{{curve_name}}_ate_is_loop_count_neg = bigint_q("{{ate_loop_count_bool}}");
-	{{curve_name}}_final_exponent = bigint<12*{{curve_name}}q_limbs>("{{final_exponent}}");
+	{{curve_name}}_ate_is_loop_count_neg = {{ate_loop_count_bool}};
+	{{curve_name}}_final_exponent = bigint<12*{{curve_name}}_q_limbs>("{{final_exponent}}");
 	{{curve_name}}_final_exponent_z = bigint_q("{{poly_u}}");
-	{{curve_name}}_final_exponent_is_z_neg = bigint_q("{{x_bool}}");
+	{{curve_name}}_final_exponent_is_z_neg = {{x_bool}};
+
+}
+} // libff

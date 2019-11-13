@@ -3,10 +3,9 @@
 # Author: Youssef El Housni
 # youssef.el.housni@fr.ey.com / youssef.housni21@gmail.com 
 
-import pystache
 from sage.all_cmdline import *   # import sage library
-import sys
-import os
+import os, errno, sys
+import pystache
 
 #TODO: for BN 'friendly' curves write coeff_b as c^4+d^6 or c^6+4d^4 and most parameters follow easily
 
@@ -423,7 +422,7 @@ def parameters_Fp6(modulus, non_residue, coeff_b, r):
     for i in range(6):
         Frobenius_coeffs_c2.append(nqr**int((2*modulus**i-2)/3))
     "compute mul_by_q for later"
-    mul_by_q.append(Frobenius_coeffs_c1[2])
+    mul_by_q.append(Frobenius_coeffs_c1[1])
     mul_by_q.append(nqr**int((modulus**i-1)/2))
     "compute coeff_b_twist for later"
     coeff_b_twist = coeff_b / nqr
@@ -491,11 +490,11 @@ def pairing_parameters(family, x, q, k, r):
 
 # fill in templates
 def fill_in_libff_templates(outdir, curve_name, curve_family, modulus_r, R2_64_r, R3_64_r, inv_64_r, R2_32_r, R3_32_r, inv_32_r, num_bits_r, euler_r, s_r, t_r, t_minus_1_over_2_r, multiplicative_generator_r, root_of_unity_r, nqr_r, nqr_to_t_r, modulus_q, R2_64_q, R3_64_q, inv_64_q, R2_32_q, R3_32_q, inv_32_q, num_bits_q, euler_q, s_q, t_q, t_minus_1_over_2_q, multiplicative_generator_q, root_of_unity_q, nqr_q, nqr_to_t_q, euler_q2, s_q2, t_q2, t_minus_1_over_2_q2, non_residue_q2, nqr_q2, nqr_to_t_q2, frobenius_q2, non_residue_q6, frobenius_q6_1, frobenius_q6_2, mul_by_q, coeff_b, twist_coeff_b, twist_type, G1_one, G2_one, non_residue_q12, frobenius_q12, ate_loop_count, ate_loop_count_bool, final_exponent, poly_u, x_bool):
-    if not os.path.exists(outdir):
-        try:
-            os.makedir(outdir)
-        except:
-            raise OSError("Can't create destination directory (%s)!" % (outdir))
+    try:
+        os.makedirs(outdir)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
     renderer = pystache.Renderer()
     init_cpp = open(outdir + '/' + curve_name + '_init.cpp', 'w')
     init_cpp.write(renderer.render_path('./templates/init_cpp.mustache', 
