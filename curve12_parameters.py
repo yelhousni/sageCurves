@@ -4,7 +4,7 @@
 # youssef.el.housni@fr.ey.com / youssef.housni21@gmail.com 
 
 """
-Computes parameters necessary for libff implementation
+Computes parameters necessary for the implementation
 of an elliptic curve from the families BN, BLS12 and BW12
 
 For these families: 
@@ -13,22 +13,37 @@ For these families:
 """
 
 from utils import *
+import sys, getopt
 
 def help():
     print('')
-    print('usage: ' + sys.argv[0] + ' <curve_file>')
-    print('e.g. : ' + sys.argv[0] + ' ./curves/alt_bn128.txt')
-    print('\n supported families:')
-    print('\tBN')
-    print('\tBLS12')
-    print('\tBW12')
+    print('usage: sage' + sys.argv[0] + ' -i <input-file> -o <output-directory> -l <target-library>')
+    print('e.g. : sage' + sys.argv[0] + ' -i ./Curves/alt_bn128.txt -o alt_bn128/ -l libff')
+    print('\n options:')
+    print('\t-h, --help: prints this help message')
+    print('\t-i, --infile: input file (supported families: bn, bls12 and bw12)')
+    print('\t-o, --outdir: output directory')
+    print('\t-l, --lib: libff (default), bellman, zexe, py_ecc')
     print('')
 	
-def main():
-    if (len(sys.argv) != 3): sys.exit(help())
+def main(argv):
+    curveFile = ''
+    outdir = ''
+    lib = 'libff'
     try:
-        curveFile = sys.argv[1]
-        outdir = sys.argv[2]
+        opts, args = getopt.getopt(argv,"hi:o:l:",["infile=","outdir=","lib="])
+    except getopt.GetoptError:
+       sys.exit(help())
+    for opt, arg in opts:
+       if opt == '-h':
+          sys.exit(help())
+       elif opt in ("-i", "--infile"):
+          curveFile = arg
+       elif opt in ("-o", "--outdir"):
+          outdir = arg
+       elif opt in ("-l", "--lib"):
+          lib = arg
+    try:
         with open(curveFile, 'r') as f:
             lines = f.readlines()
             curve_family = lines[0].split(":")[0]
@@ -71,4 +86,4 @@ def main():
     return 0
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])

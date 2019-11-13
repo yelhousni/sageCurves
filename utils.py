@@ -4,7 +4,7 @@
 # youssef.el.housni@fr.ey.com / youssef.housni21@gmail.com 
 
 from sage.all_cmdline import *   # import sage library
-import os, errno, sys
+import os, errno
 import pystache
 
 #TODO: for BN 'friendly' curves write coeff_b as c^4+d^6 or c^6+4d^4 and most parameters follow easily
