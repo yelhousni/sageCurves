@@ -10,8 +10,10 @@ sageCurves requires:
 + a working [pystache](https://github.com/defunkt/pystache) installation inside `sage`: Download the package and `sage -pip /path/to/package/`
 
 ## Tutorial
-```python
+```
 sage curve12_parameters.py -i <curve-file> -o <output-directory> -l <target-library> 
+```
+```
 options:
     -h, --help: prints this help message
     -i, --infile: input file (supported families: bn, bls12 and bw12) 
