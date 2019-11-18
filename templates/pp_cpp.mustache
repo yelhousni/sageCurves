@@ -1,0 +1,51 @@
+#include <libff/algebra/curves/{{curve_name}}/{{curve_name}}_pp.hpp>
+
+namespace libff {
+
+void {{curve_name}}_pp::init_public_params()
+{
+    init_{{curve_name}}_params();
+}
+
+{{curve_name}}_GT {{curve_name}}_pp::final_exponentiation(const {{curve_name}}_Fq12 &elt)
+{
+    return {{curve_name}}_final_exponentiation(elt);
+}
+
+{{curve_name}}_G1_precomp {{curve_name}}_pp::precompute_G1(const {{curve_name}}_G1 &P)
+{
+    return {{curve_name}}_precompute_G1(P);
+}
+
+{{curve_name}}_G2_precomp {{curve_name}}_pp::precompute_G2(const {{curve_name}}_G2 &Q)
+{
+    return {{curve_name}}_precompute_G2(Q);
+}
+
+{{curve_name}}_Fq12 {{curve_name}}_pp::miller_loop(const {{curve_name}}_G1_precomp &prec_P,
+                                         const {{curve_name}}_G2_precomp &prec_Q)
+{
+    return {{curve_name}}_miller_loop(prec_P, prec_Q);
+}
+
+{{curve_name}}_Fq12 {{curve_name}}_pp::double_miller_loop(const {{curve_name}}_G1_precomp &prec_P1,
+                                                const {{curve_name}}_G2_precomp &prec_Q1,
+                                                const {{curve_name}}_G1_precomp &prec_P2,
+                                                const {{curve_name}}_G2_precomp &prec_Q2)
+{
+    return {{curve_name}}_double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
+}
+
+{{curve_name}}_Fq12 {{curve_name}}_pp::pairing(const {{curve_name}}_G1 &P,
+                                     const {{curve_name}}_G2 &Q)
+{
+    return {{curve_name}}_pairing(P, Q);
+}
+
+{{curve_name}}_Fq12 {{curve_name}}_pp::reduced_pairing(const {{curve_name}}_G1 &P,
+                                             const {{curve_name}}_G2 &Q)
+{
+    return {{curve_name}}_reduced_pairing(P, Q);
+}
+
+} // libff

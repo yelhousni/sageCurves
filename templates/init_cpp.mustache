@@ -1,0 +1,271 @@
+#include <libff/algebra/curves/{{curve_name}}/{{curve_name}}_g1.hpp>
+#include <libff/algebra/curves/{{curve_name}}/{{curve_name}}_g2.hpp>
+#include <libff/algebra/curves/{{curve_name}}/{{curve_name}}_init.hpp>
+
+namespace libff {
+
+bigint<{{curve_name}}_r_limbs> {{curve_name}}_modulus_r;
+bigint<{{curve_name}}_q_limbs> {{curve_name}}_modulus_q;
+
+{{curve_name}}_Fq {{curve_name}}_coeff_b;
+{{curve_name}}_Fq2 {{curve_name}}_twist;
+{{curve_name}}_Fq2 {{curve_name}}_twist_coeff_b;
+{{curve_name}}_Fq {{curve_name}}_twist_mul_by_b_c0;
+{{curve_name}}_Fq {{curve_name}}_twist_mul_by_b_c1;
+{{curve_name}}_Fq2 {{curve_name}}_twist_mul_by_q_X;
+{{curve_name}}_Fq2 {{curve_name}}_twist_mul_by_q_Y;
+
+bigint<{{curve_name}}_q_limbs> {{curve_name}}_ate_loop_count;
+bool {{curve_name}}_ate_is_loop_count_neg;
+bigint<12*{{curve_name}}_q_limbs> {{curve_name}}_final_exponent;
+bigint<{{curve_name}}_q_limbs> {{curve_name}}_final_exponent_z;
+bool {{curve_name}}_final_exponent_is_z_neg;
+
+void init_{{curve_name}}_params()
+{
+	typedef bigint<{{curve_name}}_r_limbs> bigint_r;
+	typedef bigint<{{curve_name}}_q_limbs> bigint_q;
+
+	assert(sizeof(mp_limb_t) == 8 || sizeof(mp_limb_t) == 4);
+	
+    /* {{curve_name}} Fr parameters */
+
+	{{curve_name}}_modulus_r = bigint_r("{{modulus_r}}");
+	assert({{curve_name}}_Fr::modulus_is_valid());
+	if (sizeof(mp_limb_t) == 8)
+	{
+		{{curve_name}}_Fr::Rsquared = bigint_r("{{R2_64_r}}");
+		{{curve_name}}_Fr::Rcubed = bigint_r("{{R3_64_r}}");
+		{{curve_name}}_Fr::inv = 0x{{inv_64_r}};
+	}
+	if (sizeof(mp_limb_t) == 4)
+	{
+	    {{curve_name}}_Fr::Rsquared = bigint_r("{{R2_32_r}}");
+	    {{curve_name}}_Fr::Rcubed = bigint_r("{{R3_32_r}}");
+	    {{curve_name}}_Fr::inv = 0x{{inv_32_r}};
+	}
+	{{curve_name}}_Fr::num_bits = {{num_bits_r}};
+	{{curve_name}}_Fr::euler = bigint_r("{{euler_r}}");
+	{{curve_name}}_Fr::s = {{s_r}}; 
+	{{curve_name}}_Fr::t = bigint_r("{{t_r}}");
+	{{curve_name}}_Fr::t_minus_1_over_2 = bigint_r("{{t_minus_1_over_2_r}}");
+	{{curve_name}}_Fr::multiplicative_generator = {{curve_name}}_Fr("{{multiplicative_generator_r}}");
+	{{curve_name}}_Fr::root_of_unity = {{curve_name}}_Fr("{{root_of_unity_r}}");
+	{{curve_name}}_Fr::nqr = {{curve_name}}_Fr("{{nqr_r}}"); 
+	{{curve_name}}_Fr::nqr_to_t = {{curve_name}}_Fr("{{nqr_to_t_r}}");
+	
+    /* {{curve_name}} Fq parameters */
+
+	{{curve_name}}_modulus_q = bigint_q("{{modulus_q}}");
+	assert({{curve_name}}_Fq::modulus_is_valid());
+	if (sizeof(mp_limb_t) == 8)
+	{
+		{{curve_name}}_Fq::Rsquared = bigint_q("{{R2_64_q}}");
+		{{curve_name}}_Fq::Rcubed = bigint_q("{{R3_64_q}}");
+		{{curve_name}}_Fq::inv = 0x{{inv_64_q}};
+	}
+	if (sizeof(mp_limb_t) == 4)
+	{
+        {{curve_name}}_Fq::Rsquared = bigint_q("{{R2_32_q}}");
+        {{curve_name}}_Fq::Rcubed = bigint_q("{{R3_32_q}}");
+        {{curve_name}}_Fq::inv = 0x{{inv_32_q}};
+	}
+	{{curve_name}}_Fq::num_bits = {{num_bits_q}};
+	{{curve_name}}_Fq::euler = bigint_q("{{euler_q}}");
+	{{curve_name}}_Fq::s = {{s_q}}; 
+	{{curve_name}}_Fq::t = bigint_q("{{t_q}}");
+	{{curve_name}}_Fq::t_minus_1_over_2 = bigint_q("{{t_minus_1_over_2_q}}");
+	{{curve_name}}_Fq::multiplicative_generator = {{curve_name}}_Fq("{{multiplicative_generator_q}}");
+	{{curve_name}}_Fq::root_of_unity = {{curve_name}}_Fq("{{root_of_unity_q}}");
+	{{curve_name}}_Fq::nqr = {{curve_name}}_Fq("{{nqr_q}}"); 
+	{{curve_name}}_Fq::nqr_to_t = {{curve_name}}_Fq("{{nqr_to_t_q}}");
+	
+     /* {{curve_name}} Fq2 parameters */
+
+	{{curve_name}}_Fq2::euler = bigint<2*{{curve_name}}_q_limbs>("{{euler_q2}}");
+	{{curve_name}}_Fq2::s = {{s_q2}};
+	{{curve_name}}_Fq2::t = bigint<2*{{curve_name}}_q_limbs>("{{t_q2}}");
+	{{curve_name}}_Fq2::t_minus_1_over_2 = bigint<2*{{curve_name}}_q_limbs>("{{t_minus_1_over_2_q2}}");
+	{{curve_name}}_Fq2::non_residue = {{curve_name}}_Fq("{{non_residue_q2}}");
+	{{curve_name}}_Fq2::nqr = {{curve_name}}_Fq2({{curve_name}}_Fq("{{nqr_q2_c0}}"),{{curve_name}}_Fq("{{nqr_q2_c1}}"));
+	{{curve_name}}_Fq2::nqr_to_t = {{curve_name}}_Fq2({{curve_name}}_Fq("{{nqr_to_t_q2_c0}}"),{{curve_name}}_Fq("{{nqr_to_t_q2_c1}}"));
+	{{curve_name}}_Fq2::Frobenius_coeffs_c1[0] = {{curve_name}}_Fq("{{frobenius_q2_0}}");
+	{{curve_name}}_Fq2::Frobenius_coeffs_c1[1] = {{curve_name}}_Fq("{{frobenius_q2_1}}");
+	
+     /* {{curve_name}} Fq6 parameters */
+
+	{{curve_name}}_Fq6::non_residue = {{curve_name}}_Fq2({{curve_name}}_Fq("{{non_residue_q6_c0}}"),{{curve_name}}_Fq("{{non_residue_q6_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c1[0] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_10_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_10_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c1[1] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_11_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_11_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c1[2] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_12_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_12_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c1[3] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_13_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_13_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c1[4] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_14_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_14_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c1[5] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_15_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_15_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c2[0] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_20_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_20_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c2[1] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_21_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_21_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c2[2] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_22_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_22_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c2[3] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_23_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_23_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c2[4] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_24_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_24_c1}}"));
+	{{curve_name}}_Fq6::Frobenius_coeffs_c2[5] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q6_25_c0}}"),{{curve_name}}_Fq("{{frobenius_q6_25_c1}}"));
+	
+     /* {{curve_name}} Fq12 parameters */
+
+	{{curve_name}}_Fq12::non_residue = {{curve_name}}_Fq2({{curve_name}}_Fq("{{non_residue_q12_c0}}"),{{curve_name}}_Fq("{{non_residue_q12_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[0] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_0_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_0_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[1] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_1_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_1_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[2] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_2_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_2_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[3] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_3_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_3_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[4] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_4_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_4_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[5] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_5_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_5_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[6] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_6_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_6_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[7] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_7_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_7_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[8] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_8_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_8_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[9] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_9_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_9_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[10] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_10_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_10_c1}}"));
+	{{curve_name}}_Fq12::Frobenius_coeffs_c1[11] = {{curve_name}}_Fq2({{curve_name}}_Fq("{{frobenius_q12_11_c0}}"),{{curve_name}}_Fq("{{frobenius_q12_11_c1}}"));
+	
+    /* choice of short Weierstrass curve and its twist */
+
+	{{curve_name}}_coeff_b = {{curve_name}}_Fq("{{coeff_b}}");
+	{{curve_name}}_twist = {{curve_name}}_Fq2({{curve_name}}_Fq("{{non_residue_q12_c0}}"),{{curve_name}}_Fq("{{non_residue_q12_c1}}"));
+	{{curve_name}}_twist_coeff_b = {{curve_name}}_Fq2({{curve_name}}_Fq("{{twist_coeff_b_c0}}"),{{curve_name}}_Fq("{{twist_coeff_b_c1}}"));
+	{{curve_name}}_twist_mul_by_b_c0 = {{curve_name}}_coeff_b * {{curve_name}}_Fq2::non_residue;
+	{{curve_name}}_twist_mul_by_b_c1 = {{curve_name}}_coeff_b * {{curve_name}}_Fq2::non_residue;
+	{{curve_name}}_twist_mul_by_q_X = {{curve_name}}_Fq2({{curve_name}}_Fq("{{mul_by_q_0_c0}}"),{{curve_name}}_Fq("{{mul_by_q_0_c1}}"));
+	{{curve_name}}_twist_mul_by_q_Y = {{curve_name}}_Fq2({{curve_name}}_Fq("{{mul_by_q_1_c0}}"),{{curve_name}}_Fq("{{mul_by_q_1_c1}}"));
+	
+    /* choice of group G1 */
+
+	{{curve_name}}_G1::G1_zero = {{curve_name}}_G1({{curve_name}}_Fq::zero(),   
+                                                   {{curve_name}}_Fq::one(),
+                                                   {{curve_name}}_Fq::zero());
+	{{curve_name}}_G1::G1_one = {{curve_name}}_G1({{curve_name}}_Fq("{{G1_one_x}}"),
+                                                  {{curve_name}}_Fq("{{G1_one_y}}"),
+                                                  {{curve_name}}_Fq::one());
+
+    // TODO
+	{{curve_name}}_G1::wnaf_window_table.resize(0);
+    {{curve_name}}_G1::wnaf_window_table.push_back(11);
+    {{curve_name}}_G1::wnaf_window_table.push_back(24);
+    {{curve_name}}_G1::wnaf_window_table.push_back(60);
+    {{curve_name}}_G1::wnaf_window_table.push_back(127);
+
+    {{curve_name}}_G1::fixed_base_exp_window_table.resize(0);
+    // window 1 is unbeaten in [-inf, 4.99]
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(1);
+    // window 2 is unbeaten in [4.99, 10.99]
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(5);
+    // window 3 is unbeaten in [10.99, 32.29]
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(11);
+    // window 4 is unbeaten in [32.29, 55.23]
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(32);
+    // window 5 is unbeaten in [55.23, 162.03]
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(55);
+    // window 6 is unbeaten in [162.03, 360.15]
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(162);
+    // window 7 is unbeaten in [360.15, 815.44]
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(360);
+    // window 8 is unbeaten in [815.44, 2373.07]
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(815);
+    // window 9 is unbeaten in [2373.07, 6977.75]
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(2373);
+    // window 10 is unbeaten in [6977.75, 7122.23]
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(6978);
+    // window 11 is unbeaten in [7122.23, 57818.46]
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(7122);
+    // window 12 is never the best
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(0);
+    // window 13 is unbeaten in [57818.46, 169679.14]
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(57818);
+    // window 14 is never the best
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(0);
+    // window 15 is unbeaten in [169679.14, 439758.91]
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(169679);
+    // window 16 is unbeaten in [439758.91, 936073.41]
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(439759);
+    // window 17 is unbeaten in [936073.41, 4666554.74]
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(936073);
+    // window 18 is never the best
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(0);
+    // window 19 is unbeaten in [4666554.74, 7580404.42]
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(4666555);
+    // window 20 is unbeaten in [7580404.42, 34552892.20]
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(7580404);
+    // window 21 is never the best
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(0);
+    // window 22 is unbeaten in [34552892.20, inf]
+    {{curve_name}}_G1::fixed_base_exp_window_table.push_back(34552892);
+
+    /* choice of group G2 */
+
+	{{curve_name}}_G2::G2_zero = {{curve_name}}_G2({{curve_name}}_Fq2::zero(),
+                                 {{curve_name}}_Fq2::one(),
+                                 {{curve_name}}_Fq2::zero());
+	{{curve_name}}_G2::G2_one = {{curve_name}}_G2({{curve_name}}_Fq2({{curve_name}}_Fq("{{G2_one_x_c0}}"),
+                                                                     {{curve_name}}_Fq("{{G2_one_x_c1}}")),
+                                                  {{curve_name}}_Fq2({{curve_name}}_Fq("{{G2_one_y_c0}}"),
+                                                                     {{curve_name}}_Fq("{{G2_one_y_c1}}")),
+                                                  {{curve_name}}_Fq2::one());
+    // TODO
+	{{curve_name}}_G2::wnaf_window_table.resize(0);
+    {{curve_name}}_G2::wnaf_window_table.push_back(5);
+    {{curve_name}}_G2::wnaf_window_table.push_back(15);
+    {{curve_name}}_G2::wnaf_window_table.push_back(39);
+    {{curve_name}}_G2::wnaf_window_table.push_back(109);
+
+    {{curve_name}}_G2::fixed_base_exp_window_table.resize(0);
+    // window 1 is unbeaten in [-inf, 5.10]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(1);
+    // window 2 is unbeaten in [5.10, 10.43]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(5);
+    // window 3 is unbeaten in [10.43, 25.28]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(10);
+    // window 4 is unbeaten in [25.28, 59.00]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(25);
+    // window 5 is unbeaten in [59.00, 154.03]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(59);
+    // window 6 is unbeaten in [154.03, 334.25]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(154);
+    // window 7 is unbeaten in [334.25, 742.58]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(334);
+    // window 8 is unbeaten in [742.58, 2034.40]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(743);
+    // window 9 is unbeaten in [2034.40, 4987.56]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(2034);
+    // window 10 is unbeaten in [4987.56, 8888.27]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(4988);
+    // window 11 is unbeaten in [8888.27, 26271.13]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(8888);
+    // window 12 is unbeaten in [26271.13, 39768.20]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(26271);
+    // window 13 is unbeaten in [39768.20, 106275.75]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(39768);
+    // window 14 is unbeaten in [106275.75, 141703.40]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(106276);
+    // window 15 is unbeaten in [141703.40, 462422.97]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(141703);
+    // window 16 is unbeaten in [462422.97, 926871.84]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(462423);
+    // window 17 is unbeaten in [926871.84, 4873049.17]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(926872);
+    // window 18 is never the best
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(0);
+    // window 19 is unbeaten in [4873049.17, 5706707.88]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(4873049);
+    // window 20 is unbeaten in [5706707.88, 31673814.95]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(5706708);
+    // window 21 is never the best
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(0);
+    // window 22 is unbeaten in [31673814.95, inf]
+    {{curve_name}}_G2::fixed_base_exp_window_table.push_back(31673815);
+
+    /* choice of pairing */
+
+	{{curve_name}}_ate_loop_count = bigint_q("{{ate_loop_count}}");
+	{{curve_name}}_ate_is_loop_count_neg = {{ate_loop_count_bool}};
+	{{curve_name}}_final_exponent = bigint<12*{{curve_name}}_q_limbs>("{{final_exponent}}");
+	{{curve_name}}_final_exponent_z = bigint_q("{{poly_u}}");
+	{{curve_name}}_final_exponent_is_z_neg = {{x_bool}};
+
+}
+} // libff

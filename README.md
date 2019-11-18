@@ -2,14 +2,25 @@
 ## Overview
 A sage script to compute all parameters needed to add a new elliptic curve to [libff](https://github.com/EYBlockchain/zk-swap-libff). The script support M- and D- type curves of embedding degree `k=12` constructed as tower fields `Fq_12` over `Fq_6` over `Fq_2`. Families include Barreto-Naehrig (BN), Barreto-Lynn-Scott (BLS12) and Brezing-Weng (BW12).
 
+This repo was used to add 8 curves to libff [here](https://github.com/EYBlockchain/zk-swap-libff/tree/ey/libff/algebra/curves)
+
 ## Requirements
-sageCurves requires a working [SageMath](http://www.sagemath.org) installation, and has been tested on SageMath version 8.8.
+sageCurves requires:
++ a working [SageMath](http://www.sagemath.org) installation, and has been tested on SageMath version 8.8.
++ a working [pystache](https://github.com/defunkt/pystache) installation inside `sage`: Download the package and `sage -pip /path/to/package/`
 
 ## Tutorial
-```python
-sage -python curve_parameters_libff.py path/to/curve_file.txt > path/to/output_dir/curve_name_init.cpp
 ```
-`curve_file.txt` should be written as follow: 
+sage curve12_parameters.py -i <curve-file> -o <output-directory> -l <target-library> 
+```
+```
+options:
+    -h, --help: prints this help message
+    -i, --infile: input file (supported families: bn, bls12 and bw12) 
+    -o, --outdir: output directory
+    -l, --lib: libff (default), bellman, zexe, py_ecc
+```
+`<curve-file>` should be written as follow: 
 ```
 type:curve_name
 u
@@ -21,7 +32,17 @@ Where:
 
 ### Examples
 ```python
-sage -python curve_parameters_libff.py Curves/bls12_377.txt > ./bls12_377_init.cpp
+sage curve_parameters_libff.py -i Curves/bls12_377.txt -o ./bls12_377_init.cpp -l libff
 ```
-This repo was used to add 8 curves to libff [here](https://github.com/EYBlockchain/zk-swap-libff/tree/ey/libff/algebra/curves)
-
+The output files generated under `<outdir>` are:
++ `bls12_377_init.cpp`
++ `bls12_377_init.hpp`
++ `bls12_377_g1.hpp`
++ `bls12_377_g1.cpp`
++ `bls12_377_g2.hpp`
++ `bls12_377_g2.cpp`
++ `bls12_377_pp.hpp`
++ `bls12_377_pp.cpp`
++ `bls12_377_pairing.hpp`
++ `bls12_377_pairing.cpp`
+ 

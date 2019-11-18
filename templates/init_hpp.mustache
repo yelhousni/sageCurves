@@ -1,0 +1,50 @@
+#ifndef {{curve_name_maj}}_INIT_HPP_
+#define {{curve_name_maj}}_INIT_HPP_
+#include <libff/algebra/curves/public_params.hpp>
+#include <libff/algebra/fields/fp.hpp>
+#include <libff/algebra/fields/fp12_2over3over2.hpp>
+#include <libff/algebra/fields/fp2.hpp>
+#include <libff/algebra/fields/fp6_3over2.hpp>
+
+namespace libff {
+
+const mp_size_t {{curve_name}}_r_bitcount = {{num_bits_r}};
+const mp_size_t {{curve_name}}_q_bitcount = {{num_bits_q}};
+
+const mp_size_t {{curve_name}}_r_limbs = ({{curve_name}}_r_bitcount+GMP_NUMB_BITS-1)/GMP_NUMB_BITS;
+const mp_size_t {{curve_name}}_q_limbs = ({{curve_name}}_q_bitcount+GMP_NUMB_BITS-1)/GMP_NUMB_BITS;
+
+extern bigint<{{curve_name}}_r_limbs> {{curve_name}}_modulus_r;
+extern bigint<{{curve_name}}_q_limbs> {{curve_name}}_modulus_q;
+
+typedef Fp_model<{{curve_name}}_r_limbs, {{curve_name}}_modulus_r> {{curve_name}}_Fr;
+typedef Fp_model<{{curve_name}}_q_limbs, {{curve_name}}_modulus_q> {{curve_name}}_Fq;
+typedef Fp2_model<{{curve_name}}_q_limbs, {{curve_name}}_modulus_q> {{curve_name}}_Fq2;
+typedef Fp6_3over2_model<{{curve_name}}_q_limbs, {{curve_name}}_modulus_q> {{curve_name}}_Fq6;
+typedef Fp12_2over3over2_model<{{curve_name}}_q_limbs, {{curve_name}}_modulus_q> {{curve_name}}_Fq12;
+typedef {{curve_name}}_Fq12 {{curve_name}}_GT;
+
+// parameters for Barreto--Naehrig curve E/Fq : y^2 = x^3 + b
+extern {{curve_name}}_Fq {{curve_name}}_coeff_b;
+// parameters for twisted Barreto--Naehrig curve E'/Fq2 : y^2 = x^3 + b/xi
+extern {{curve_name}}_Fq2 {{curve_name}}_twist;
+extern {{curve_name}}_Fq2 {{curve_name}}_twist_coeff_b;
+extern {{curve_name}}_Fq {{curve_name}}_twist_mul_by_b_c0;
+extern {{curve_name}}_Fq {{curve_name}}_twist_mul_by_b_c1;
+extern {{curve_name}}_Fq2 {{curve_name}}_twist_mul_by_q_X;
+extern {{curve_name}}_Fq2 {{curve_name}}_twist_mul_by_q_Y;
+
+// parameters for pairing
+extern bigint<{{curve_name}}_q_limbs> {{curve_name}}_ate_loop_count;
+extern bool {{curve_name}}_ate_is_loop_count_neg;
+extern bigint<12*{{curve_name}}_q_limbs> {{curve_name}}_final_exponent;
+extern bigint<{{curve_name}}_q_limbs> {{curve_name}}_final_exponent_z;
+extern bool {{curve_name}}_final_exponent_is_z_neg;
+
+void init_{{curve_name}}_params();
+
+class {{curve_name}}_G1;
+class {{curve_name}}_G2;
+
+} // libff
+#endif // {{curve_name_maj}}_INIT_HPP_
