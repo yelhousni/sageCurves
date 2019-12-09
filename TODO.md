@@ -1,5 +1,5 @@
 ## templates
-* [ ] `BW12` pairing-cpp template
+* [x] `BW12` pairing-cpp template
 * [ ] `M`-type pairing-cpp template
 * [ ] All `SW6` templates
 * [ ] All `MNT6` templates
