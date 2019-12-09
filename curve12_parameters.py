@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 # Author: Youssef El Housni
-# youssef.el.housni@fr.ey.com / youssef.housni21@gmail.com 
+# youssef.el.housni@fr.ey.com / youssef.housni21@gmail.com
 
 """
 Computes parameters necessary for the implementation
 of an elliptic curve from the families BN, BLS12 and BW12
 
-For these families: 
+For these families:
     * embedding degree k=12
     * complex multiplication discriminant D=-3
 """
@@ -25,7 +25,7 @@ def help():
     print('\t-o, --outdir: output directory')
     print('\t-l, --lib: libff (default), bellman, zexe, py_ecc')
     print('')
-	
+
 def main(argv):
     curveFile = ''
     outdir = ''
@@ -59,14 +59,14 @@ def main(argv):
         elliptic_curve = small_B_twist(make_curve(modulus_q,frobenius_trace,modulus_r,embedding_degree,CM_discriminant))
         coeff_a = elliptic_curve.a4()
         coeff_b = elliptic_curve.a6()
-            
+
         # Fr parameters
         R2_64_r, R3_64_r, inv_64_r, R2_32_r, R3_32_r, inv_32_r, num_bits_r, euler_r, s_r, t_r, t_minus_1_over_2_r, multiplicative_generator_r, root_of_unity_r, nqr_r, nqr_to_t_r = parameters_Fp(modulus_r)
 
         # Fq parameters
         R2_64_q, R3_64_q, inv_64_q, R2_32_q, R3_32_q, inv_32_q, num_bits_q, euler_q, s_q, t_q, t_minus_1_over_2_q, multiplicative_generator_q, root_of_unity_q, nqr_q, nqr_to_t_q = parameters_Fp(modulus_q)
 
-        # Fq2 parameters 
+        # Fq2 parameters
         euler_q2, s_q2, t_q2, t_minus_1_over_2_q2, non_residue_q2, nqr_q2, nqr_to_t_q2, frobenius_q2 = parameters_Fp2(modulus_q)
 
         # Fq6 parameters
