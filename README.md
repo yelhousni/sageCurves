@@ -1,13 +1,13 @@
 # sageCurves
 ## Overview
-A sage script to compute all parameters needed to add a new elliptic curve to [libff](https://github.com/EYBlockchain/zk-swap-libff). The script support M- and D- type curves of embedding degree `k=12` constructed as tower fields `Fq_12` over `Fq_6` over `Fq_2`. Families include Barreto-Naehrig (BN), Barreto-Lynn-Scott (BLS12) and Brezing-Weng (BW12).
+A sage script to compute all parameters needed to add a new elliptic curve to [libff](https://github.com/EYBlockchain/zk-swap-libff), [bellman](https://github.com/zkcrypto/bellman), [zexe](https://github.com/scipr-lab/zexe) or [py_ecc](https://github.com/ethereum/py_ecc) libraries (wip: works for *libff* for now). The script support M- and D- type curves of embedding degree `k=12` constructed as tower fields `Fq_12` over `Fq_6` over `Fq_2`. Families include Barreto-Naehrig (BN), Barreto-Lynn-Scott (BLS12) and Brezing-Weng (BW12).
 
 This repo was used to add 8 curves to libff [here](https://github.com/EYBlockchain/zk-swap-libff/tree/ey/libff/algebra/curves)
 
 ## Requirements
 sageCurves requires:
-+ a working [SageMath](http://www.sagemath.org) installation, and has been tested on SageMath version 8.8.
-+ a working [pystache](https://github.com/defunkt/pystache) installation inside `sage`: Download the package and `sage -pip /path/to/package/`
++ a working [SageMath](http://www.sagemath.org) installation (tested on SageMath version 8.8)
++ a working [pystache](https://github.com/defunkt/pystache) installation inside `sage` (Download the package and `sage -pip /path/to/package/`)
 
 ## Tutorial
 ```
