@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Author: Youssef El Housni
-# youssef.el.housni@fr.ey.com / youssef.housni21@gmail.com 
+# youssef.el.housni@fr.ey.com / youssef.housni21@gmail.com
 
 from sage.all_cmdline import *   # import sage library
 import os, errno
@@ -15,23 +15,23 @@ def make_curve(q,t,r,k,D,debug=False):
     credits to https://github.com/scipr-lab/ecfactory
 
     Description:
-    
+
         Finds the curve equation for the elliptic curve (q,t,r,k,D) using the Complex Multiplication method
-    
+
     Input:
-    
+
         q - size of prime field
         t - trace of Frobenius
         r - size of prime order subgroup
         k - embedding degree
         D - (negative) fundamental discriminant
-    
+
     Output:
-    
+
         E - elliptic curve over F_q with trace t,
             a subgroup of order r with embedding degree k,
             and fundamental discriminant D
-    
+
     """
     assert is_valid_curve(q,t,r,k,D), 'Invalid input. No curve exists.' # check inputs
     if debug:
@@ -40,7 +40,7 @@ def make_curve(q,t,r,k,D,debug=False):
     if debug:
         print('Computed Hilbert class polynomial')
     check = False
-    j_inv = poly.any_root(GF(q)) # find j-invariant    
+    j_inv = poly.any_root(GF(q)) # find j-invariant
     orig_curve = EllipticCurve(GF(q), j=j_inv) # make a curve
     E = orig_curve
     check = test_curve(q,t,r,k,D,E) # see if this is the right curve
@@ -93,25 +93,25 @@ def make_curve(q,t,r,k,D,debug=False):
         return False
     return E
 
-def test_curve(q,t,r,k,D,E): 
+def test_curve(q,t,r,k,D,E):
     """
     Description:
-    
+
        Tests that E is an elliptic curve over F_q with trace t, a subgroup of order r with embedding degree k, and fundamental discriminant D
-    
+
     Input:
-    
+
         q - size of prime field
         t - trace of Frobenius
         r - size of prime order subgroup
         k - embedding degree
         D - (negative) fundamental discriminant
-    
+
     Output:
-    
+
         bool - true iff E is an elliptic curve over F_q with trace t, a subgroup of order r with embedding degree k, and fundamental discriminant D
-    
-    """    
+
+    """
     bool = True
     bool = bool and (power_mod(q, k, r) == 1) #q^k -1 ==0 mod r
     bool = bool and (E.trace_of_frobenius() == t)
@@ -167,7 +167,7 @@ def get_q(family, u):
 
     Input:
 
-        family - pairing-friendly family (bn, bls12 or bw12) 
+        family - pairing-friendly family (bn, bls12 or bw12)
         u - curve integer
 
     Output:
@@ -179,7 +179,7 @@ def get_q(family, u):
     elif (family == 'bls12'):
         return Integer((u-1)**2 * ((u**4-u**2+1)/3) + u)
     elif (family == 'bw12'):
-        return Integer(1728*u**6+2160*u**5+1548*u**4+756*u**3+240*u**2+54*u+7) 
+        return Integer(1728*u**6+2160*u**5+1548*u**4+756*u**3+240*u**2+54*u+7)
     else:
         raise Exception('family not supported')
 
@@ -191,7 +191,7 @@ def get_r(family, u):
 
     Input:
 
-        family - pairing-friendly family (bn, bls12 or bw12) 
+        family - pairing-friendly family (bn, bls12 or bw12)
         u - curve integer
 
     Output:
@@ -203,7 +203,7 @@ def get_r(family, u):
     elif (family == 'bls12'):
         return Integer(u**4-u**2+1)
     elif (family == 'bw12'):
-        return Integer(36*u**4+36*u**3+18*u**2+6*u+1) 
+        return Integer(36*u**4+36*u**3+18*u**2+6*u+1)
     else:
         raise Exception('family not supported')
 
@@ -215,7 +215,7 @@ def get_t(family, u):
 
     Input:
 
-        family - pairing-friendly family (bn, bls12 or bw12) 
+        family - pairing-friendly family (bn, bls12 or bw12)
         u - curve integer
 
     Output:
@@ -234,17 +234,17 @@ def get_t(family, u):
 def small_B_twist(E):
     """
     Description:
-        
+
         Finds a curve isogenous to E that has small B in the curve equation y^2 = x^3 + A*x + B
-    
+
     Input:
-    
+
         E - elliptic curve
-    
+
     Output:
-    
+
         E' - elliptic curve isogenous to E that has small B in the curve equation y^2 = x^3 + A*x + B
-    
+
     """
     b = E.ainvs()[4]
     q = E.base_field().order()
@@ -259,7 +259,7 @@ def small_B_twist(E):
             d = Integer(d)
             bool = False
         except ValueError as e:
-            s+=1 
+            s+=1
             pass
     ainvs = [i for i in E.ainvs()]
     ainvs[3] *= d**2
@@ -274,7 +274,7 @@ def linearPoly2tab(poly):
     c1 = 0  if len(coeffs_list)==1  else coeffs_list[1]
     return c0, c1
 
-def next_power_of_2(x):  
+def next_power_of_2(x):
      return 1 if x == 0 else int(log(2 **(x - 1).nbits())/log(2))
 
 def round_up(num, word):
@@ -295,20 +295,20 @@ def montgomery(p):
         2x Integer - Montgomery constant squared for 64-arch and 32-arch
         2x Integer - Montgomery constant cubed for 64-arch and 32-arch
         2x hex - inverse of minus modulus for 64-arch and 32-arch
-    """ 
+    """
     size64 = round_up(next_power_of_2(p), 64 )
-    R64 = 2 **size64 
+    R64 = 2 **size64
     R2_64 = mod(R64**2 , p)
     R3_64 = mod(R64**3 , p)
-    inv64 = hex(-1 /p % 2 **64 )
+    inv64 = (-1 /p % 2 **64 ).hex()
 
     size32 = round_up(next_power_of_2(p), 32 )
-    R32 = 2 **size32 
+    R32 = 2 **size32
     R2_32 = mod(R32**2 , p)
     R3_32 = mod(R32**3 , p)
-    inv32 = hex(-1 /p % 2 **32 )
+    inv32 = (-1 /p % 2 **32 ).hex()
 
-    return R2_64, R3_64, inv64, R2_32, R3_32, inv32  
+    return R2_64, R3_64, inv64, R2_32, R3_32, inv32
 
 def twoAdicity(num):
     """
@@ -322,13 +322,13 @@ def twoAdicity(num):
 
     Output:
 
-        Integer - 2-adicity order 
-    """ 
-    if num % 2  != 0 : return 1 
-    factor = 0 
+        Integer - 2-adicity order
+    """
+    if num % 2  != 0 : return 1
+    factor = 0
     while num % 2  == 0 :
-        num /= 2 
-        factor += 1 
+        num /= 2
+        factor += 1
     return factor
 
 def parameters_Fp(modulus):
@@ -343,8 +343,8 @@ def parameters_Fp(modulus):
 
     Output:
         Rsq8, Rcu8, inv8, Rsq4, Rcu4, inv4, num_bits, euler, s, t, t_minus_1_over_2, multiplicative_generator, root_of_unity, nqr, nqr_to_t
-    """ 
-    Rsq8, Rcu8, inv8, Rsq4, Rcu4, inv4 = montgomery(modulus) 
+    """
+    Rsq8, Rcu8, inv8, Rsq4, Rcu4, inv4 = montgomery(modulus)
     num_bits = modulus.nbits()
     euler = int((modulus-1)/2)
     s = twoAdicity(modulus-1)
@@ -370,13 +370,13 @@ def parameters_Fp2(modulus):
 
     Output:
         euler, s, t, t_minus_1_over_2, non_residue, nqr, nqr_to_t, Frobenius_coeff_C1
-    """ 
+    """
     euler = int((modulus**2-1)/2)
     s = twoAdicity(modulus**2-1)
     t = int((modulus**2-1)/2**s)
     t_minus_1_over_2 = int((t-1)/2)
     Fq = GF(modulus)
-    if (modulus % 4 == 3): 
+    if (modulus % 4 == 3):
         non_residue = Fq(-1) # Legendre symbol is clearly -1
     else:
         non_residue = least_quadratic_nonresidue(modulus)
@@ -386,7 +386,7 @@ def parameters_Fp2(modulus):
     PP = Fq2['zz']; (zz,) = PP._first_ngens(1)
     nqr = u
     while(not (zz**2 -nqr).is_irreducible()):
-        nqr += 1 
+        nqr += 1
     nqr_to_t = nqr**t
     Frobenius_coeff_C1 = lift(Mod(non_residue, modulus)**((modulus**0 -1 )/2 )), lift(Mod(non_residue, modulus)**((modulus**1 -1 )/2 ))
     return euler, s, t, t_minus_1_over_2, non_residue, nqr, nqr_to_t, Frobenius_coeff_C1
@@ -406,14 +406,14 @@ def parameters_Fp6(modulus, non_residue, coeff_b, r):
 
     Output:
         nqr, Frobenius_coeffs_c1, Frobenius_coeffs_c2, mul_by_q, coeff_b_twist, twist_type, G1_one, G2_one
-    """ 
+    """
     Fq = GF(modulus)
     P = Fq['z']; (z,) = P._first_ngens(1)
     Fq2 = GF(modulus**2 , modulus=z**2 -non_residue, names=('u',)); (u,) = Fq2._first_ngens(1)
     PP = Fq2['zz']; (zz,) = PP._first_ngens(1)
     nqr = u
     while(not (zz**3 -nqr).is_irreducible() or not (zz**6 -nqr).is_irreducible()):
-        nqr += 1 
+        nqr += 1
     Frobenius_coeffs_c1 = []
     Frobenius_coeffs_c2 = []
     mul_by_q = []
@@ -427,7 +427,7 @@ def parameters_Fp6(modulus, non_residue, coeff_b, r):
     "compute coeff_b_twist for later"
     coeff_b_twist = coeff_b / nqr
     Et = EllipticCurve(Fq2, [0 , coeff_b_twist])
-    if (Et.order() % r != 0 ): 
+    if (Et.order() % r != 0 ):
         coeff_b_twist = coeff_b * nqr
         twist_type = 'M'
         Et = EllipticCurve(Fq2, [0 , coeff_b_twist])
@@ -439,11 +439,10 @@ def parameters_Fp6(modulus, non_residue, coeff_b, r):
     # for bls12-381, take: https://github.com/zkcrypto/bls12_381/blob/master/src/notes/design.rs
     E = EllipticCurve(Fq, [0 , coeff_b])
     cofactor = Integer(E.order() // r)
-    print('here')
     if ((1+coeff_b).is_square()): # it is the case for BN
         G1_one = cofactor * E(1, sqrt(1+coeff_b))
     else:
-        G1_one = cofactor * E.random_point() 
+        G1_one = cofactor * E.random_point()
     "compute G2 generator for later"
     # to change to fit chosen generators in standard curves
     # for bls12-381, take: https://github.com/zkcrypto/bls12_381/blob/master/src/notes/design.rs
@@ -464,7 +463,7 @@ def parameters_Fp12(modulus, nqr):
 
     Output:
         non_residue, frobenius_coeffs
-    """ 
+    """
 
     Frob12_coeff_C1 = []
     for i in range(12):
@@ -473,16 +472,16 @@ def parameters_Fp12(modulus, nqr):
 
 def pairing_parameters(family, x, q, k, r):
     if (family == 'bn' or family == 'bw12'):
-        ate_loop_count = 6*x+2 
+        ate_loop_count = 6*x+2
     elif (family == 'bls12'):
         ate_loop_count = x
-    else: 
-        raise Exception("family unknown or not supported")
-    if (ate_loop_count < 0 ): 
-        ate_loop_is_neg = 'true'; 
     else:
-        ate_loop_is_neg = 'false'; 
-    final_exponent = (q**k-1)/r 
+        raise Exception("family unknown or not supported")
+    if (ate_loop_count < 0 ):
+        ate_loop_is_neg = 'true';
+    else:
+        ate_loop_is_neg = 'false';
+    final_exponent = (q**k-1)/r
     if (x<0 ):
         final_exponent_is_z_neg = 'true'
     else:
@@ -498,7 +497,7 @@ def fill_in_libff_templates(outdir, curve_name, curve_family, modulus_r, R2_64_r
             raise
     renderer = pystache.Renderer()
     init_cpp = open(outdir + '/' + curve_name + '_init.cpp', 'w')
-    init_cpp.write(renderer.render_path('./templates/init_cpp.mustache', 
+    init_cpp.write(renderer.render_path('./templates/init_cpp.mustache',
         {'curve_name': curve_name},
         {'curve_family': curve_family},
         {'modulus_r': modulus_r},
@@ -619,44 +618,44 @@ def fill_in_libff_templates(outdir, curve_name, curve_family, modulus_r, R2_64_r
         {'x_bool': x_bool}))
     init_cpp.close()
     init_hpp = open(outdir + '/' + curve_name + '_init.hpp', 'w')
-    init_hpp.write(renderer.render_path('./templates/init_hpp.mustache', 
+    init_hpp.write(renderer.render_path('./templates/init_hpp.mustache',
         {'curve_name': curve_name},
         {'curve_name_maj': curve_name.upper()},
         {'num_bits_r': num_bits_r},
         {'num_bits_q': num_bits_q}))
     init_hpp.close()
     g1_cpp = open(outdir + '/' + curve_name + '_g1.cpp', 'w')
-    g1_cpp.write(renderer.render_path('./templates/g1_cpp.mustache', 
+    g1_cpp.write(renderer.render_path('./templates/g1_cpp.mustache',
         {'curve_name': curve_name},
         {'curve_name_maj': curve_name.upper()}))
     g1_cpp.close()
     g1_hpp = open(outdir + '/' + curve_name + '_g1.hpp', 'w')
-    g1_hpp.write(renderer.render_path('./templates/g1_hpp.mustache', 
+    g1_hpp.write(renderer.render_path('./templates/g1_hpp.mustache',
         {'curve_name': curve_name},
         {'curve_name_maj': curve_name.upper()}))
     g1_hpp.close()
     g2_cpp = open(outdir + '/' + curve_name + '_g2.cpp', 'w')
-    g2_cpp.write(renderer.render_path('./templates/g2_cpp.mustache', 
+    g2_cpp.write(renderer.render_path('./templates/g2_cpp.mustache',
         {'curve_name': curve_name},
         {'curve_name_maj': curve_name.upper()}))
     g2_cpp.close()
     g2_hpp = open(outdir + '/' + curve_name + '_g2.hpp', 'w')
-    g2_hpp.write(renderer.render_path('./templates/g2_hpp.mustache', 
+    g2_hpp.write(renderer.render_path('./templates/g2_hpp.mustache',
         {'curve_name': curve_name},
         {'curve_name_maj': curve_name.upper()}))
     g2_hpp.close()
     pp_cpp = open(outdir + '/' + curve_name + '_pp.cpp', 'w')
-    pp_cpp.write(renderer.render_path('./templates/pp_cpp.mustache', 
+    pp_cpp.write(renderer.render_path('./templates/pp_cpp.mustache',
         {'curve_name': curve_name},
         {'curve_name_maj': curve_name.upper()}))
     pp_cpp.close()
     pp_hpp = open(outdir + '/' + curve_name + '_pp.hpp', 'w')
-    pp_hpp.write(renderer.render_path('./templates/pp_hpp.mustache', 
+    pp_hpp.write(renderer.render_path('./templates/pp_hpp.mustache',
         {'curve_name': curve_name},
         {'curve_name_maj': curve_name.upper()}))
     pp_hpp.close()
     pairing_hpp = open(outdir + '/' + curve_name + '_pairing.hpp', 'w')
-    pairing_hpp.write(renderer.render_path('./templates/pairing_hpp.mustache', 
+    pairing_hpp.write(renderer.render_path('./templates/pairing_hpp.mustache',
         {'curve_name': curve_name},
         {'curve_name_maj': curve_name.upper()}))
     pairing_hpp.close()
@@ -667,29 +666,29 @@ def fill_in_libff_templates(outdir, curve_name, curve_family, modulus_r, R2_64_r
                 {'curve_name': curve_name},
                 {'curve_name_maj': curve_name.upper()}))
         elif (twist_type == 'M'):
-            pairing_cpp.write(renderer.render_path('./templates/pairing_bn_M_cpp.mustache', 
+            pairing_cpp.write(renderer.render_path('./templates/pairing_bn_M_cpp.mustache',
                 {'curve_name': curve_name},
                 {'curve_name_maj': curve_name.upper()}))
         else:
             raise Exception('unvalid twist type')
     elif (curve_family == 'bls12'):
         if (twist_type == 'D'):
-            pairing_cpp.write(renderer.render_path('./templates/pairing_bls12_D_cpp.mustache', 
+            pairing_cpp.write(renderer.render_path('./templates/pairing_bls12_D_cpp.mustache',
                 {'curve_name': curve_name},
                 {'curve_name_maj': curve_name.upper()}))
         elif (twist_type == 'M'):
-            pairing_cpp.write(renderer.render_path('./templates/pairing_bls12_M_cpp.mustache', 
+            pairing_cpp.write(renderer.render_path('./templates/pairing_bls12_M_cpp.mustache',
                 {'curve_name': curve_name},
                 {'curve_name_maj': curve_name.upper()}))
         else:
             raise Exception('unvalid twist type')
     elif (curve_family == 'bw12'):
         if (twist_type == 'D'):
-            pairing_cpp.write(renderer.render_path('./templates/pairing_bw12_D_cpp.mustache', 
+            pairing_cpp.write(renderer.render_path('./templates/pairing_bw12_D_cpp.mustache',
                 {'curve_name': curve_name},
                 {'curve_name_maj': curve_name.upper()}))
         elif (twist_type == 'M'):
-            pairing_cpp.write(renderer.render_path('./templates/pairing_bw12_M_cpp.mustache', 
+            pairing_cpp.write(renderer.render_path('./templates/pairing_bw12_M_cpp.mustache',
                 {'curve_name': curve_name},
                 {'curve_name_maj': curve_name.upper()}))
         else:

@@ -56,8 +56,8 @@ def main(argv):
         modulus_r = get_r(curve_family, poly_u)
         embedding_degree = Integer(12)
         CM_discriminant = Integer(-3)
-        elliptic_curve = small_B_twist(make_curve(modulus_q,frobenius_trace,modulus_r,embedding_degree,CM_discriminant))
-        coeff_a = elliptic_curve.a4()
+        # elliptic_curve = small_B_twist(make_curve(modulus_q,frobenius_trace,modulus_r,embedding_degree,CM_discriminant))
+        elliptic_curve = make_curve(modulus_q,frobenius_trace,modulus_r,embedding_degree,CM_discriminant)
         coeff_b = elliptic_curve.a6()
 
         # Fr parameters

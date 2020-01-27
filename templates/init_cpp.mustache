@@ -127,8 +127,8 @@ void init_{{curve_name}}_params()
     /* choice of short Weierstrass curve and its twist */
 
 	{{curve_name}}_coeff_b = {{curve_name}}_Fq("{{coeff_b}}");
-	{{curve_name}}_twist = {{curve_name}}_Fq2({{curve_name}}_Fq("{{non_residue_q12_c0}}"),{{curve_name}}_Fq("{{non_residue_q12_c1}}"));
-	{{curve_name}}_twist_coeff_b = {{curve_name}}_Fq2({{curve_name}}_Fq("{{twist_coeff_b_c0}}"),{{curve_name}}_Fq("{{twist_coeff_b_c1}}"));
+	{{curve_name}}_twist = {{curve_name}}_Fq2({{curve_name}}_Fq("{{non_residue_q12_c0}}"), {{curve_name}}_Fq("{{non_residue_q12_c1}}"));
+	{{curve_name}}_twist_coeff_b = {{curve_name}}_Fq2({{curve_name}}_Fq("{{twist_coeff_b_c0}}"), {{curve_name}}_Fq("{{twist_coeff_b_c1}}"));
 	{{curve_name}}_twist_mul_by_b_c0 = {{curve_name}}_coeff_b * {{curve_name}}_Fq2::non_residue;
 	{{curve_name}}_twist_mul_by_b_c1 = {{curve_name}}_coeff_b * {{curve_name}}_Fq2::non_residue;
 	{{curve_name}}_twist_mul_by_q_X = {{curve_name}}_Fq2({{curve_name}}_Fq("{{mul_by_q_0_c0}}"),{{curve_name}}_Fq("{{mul_by_q_0_c1}}"));
