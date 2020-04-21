@@ -2,8 +2,6 @@
 ## Overview
 A sage script to compute all parameters needed to add a new elliptic curve to [libff](https://github.com/EYBlockchain/zk-swap-libff), [bellman](https://github.com/zkcrypto/bellman), [zexe](https://github.com/scipr-lab/zexe) or [py_ecc](https://github.com/ethereum/py_ecc) libraries (wip: works for *libff* for now). The script support M- and D- type curves of embedding degree `k=12` constructed as tower fields `Fq_12` over `Fq_6` over `Fq_2`. Families include Barreto-Naehrig (BN), Barreto-Lynn-Scott (BLS12) and Brezing-Weng (BW12).
 
-This repo was used to add 8 curves to libff [here](https://github.com/EYBlockchain/zk-swap-libff/tree/ey/libff/algebra/curves)
-
 ## Requirements
 sageCurves requires:
 + a working [SageMath](http://www.sagemath.org) installation (tested on SageMath version 8.8)
@@ -20,7 +18,7 @@ options:
     -o, --outdir: output directory
     -l, --lib: libff (default), bellman, zexe, py_ecc
 ```
-`<curve-file>` should be written as follow: 
+`<curve-file>` should be written as follows:
 ```
 type:curve_name
 u
@@ -32,7 +30,7 @@ Where:
 
 ### Examples
 ```python
-sage curve_parameters_libff.py -i Curves/bls12_377.txt -o ./bls12_377_init.cpp -l libff
+sage curve_parameters_libff.py -i eg/bls12_377.txt -o ./bls12_377_init.cpp -l libff
 ```
 The output files generated under `<outdir>` are:
 + `bls12_377_init.cpp`
