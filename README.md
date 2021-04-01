@@ -1,6 +1,6 @@
 # sageCurves
 ## Overview
-A sage script to compute all parameters needed to add a new elliptic curve to [libff](https://github.com/EYBlockchain/zk-swap-libff), [bellman](https://github.com/zkcrypto/bellman), [zexe](https://github.com/scipr-lab/zexe) or [py_ecc](https://github.com/ethereum/py_ecc) libraries (wip: works for *libff* for now). The script support M- and D- type curves of embedding degree `k=12` constructed as tower fields `Fq_12` over `Fq_6` over `Fq_2`. Families include Barreto-Naehrig (BN), Barreto-Lynn-Scott (BLS12) and Brezing-Weng (BW12).
+A sage script to compute all parameters needed to add a new elliptic curve to [libff](https://github.com/EYBlockchain/zk-swap-libff) librarie. The script support M- and D- type curves of embedding degree `k=12` constructed as tower fields `Fq_12` over `Fq_6` over `Fq_2`. Families include Barreto-Naehrig (BN), Barreto-Lynn-Scott (BLS12) and Brezing-Weng (BW12).
 
 ## Requirements
 sageCurves requires:

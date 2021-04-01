@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Author: Youssef El Housni
-# youssef.el.housni@fr.ey.com / youssef.housni21@gmail.com
+# youssef.housni21@gmail.com
 
 from sage.all_cmdline import *   # import sage library
 import os, errno
